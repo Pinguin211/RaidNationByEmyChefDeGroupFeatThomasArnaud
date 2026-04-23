@@ -15,6 +15,7 @@ public class Raid extends Activite{
 	private String difficulte;
 	private String type;
 	private Boolean isFarmSession;
+	private String nom;
 	
 	public Raid() {
 		super();
@@ -51,6 +52,16 @@ public class Raid extends Activite{
 	public void setIsFarmSession(Boolean isFarmSession) {
 		this.isFarmSession = isFarmSession;
 	}
+
+	public String getNom() {
+		return nom;
+	}
+
+	public void setNom(String nom) {
+		this.nom = nom;
+	}
+
+	
 	
 	
 	
