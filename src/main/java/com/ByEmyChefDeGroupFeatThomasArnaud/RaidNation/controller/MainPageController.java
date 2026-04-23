@@ -29,4 +29,24 @@ public class MainPageController {
     public String classesPage() {
         return "forward:/classes.html";
     }
+    
+    /**
+     * Affiche la page principale d'ajout de groupe.
+     *
+     * @return forward vers la page groupes
+     */
+    @GetMapping({"/groupes", "/groupes/"})
+    public String groupesPage() {
+        return "forward:/groupes.html";
+    }
+
+    /**
+     * Affiche la page principale de gestion des players.
+     *
+     * @return forward vers la page players
+     */
+    @GetMapping({"/players", "/players/"})
+    public String playersPage() {
+        return "forward:/players.html";
+    }
 }

@@ -7,6 +7,12 @@ class AppLayout extends HTMLElement {
         const shadow = this.attachShadow({ mode: "open" });
         shadow.innerHTML = `
             <style>
+                :host {
+                    display: block;
+                    width: 100%;
+                    min-height: 100vh;
+                }
+
                 :root {
                     font-family: "Segoe UI", Tahoma, sans-serif;
                     color: #0f172a;

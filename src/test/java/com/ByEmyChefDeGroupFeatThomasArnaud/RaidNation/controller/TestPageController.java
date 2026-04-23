@@ -48,4 +48,15 @@ public class TestPageController {
     public String testGroupesPage() {
         return "forward:/test/groupes.html";
     }
+    
+    
+    /**
+     * Redirige vers la page de test raids.
+     *
+     * @return forward vers la page raids
+     */
+    @GetMapping({"/test/raids", "/test/raids/"})
+    public String testRaidsPage() {
+        return "forward:/test/raids.html";
+    }
 }

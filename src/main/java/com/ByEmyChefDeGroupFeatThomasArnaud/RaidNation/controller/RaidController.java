@@ -10,24 +10,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.RaidRepository;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Raid;
 
 @RestController
+@RequestMapping("/api/raids")
 public class RaidController {
 	
 	@Autowired 
 	private RaidRepository raidRepository;
 	
-	@PostMapping("/new-raid")
+	@PostMapping
 	public ResponseEntity<Raid> createRaid(@RequestBody Raid r) {	
 		raidRepository.save(r);
 		return ResponseEntity.ok(r);
 	}
 	
-	@GetMapping("/raid/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<Raid> getRaid(@PathVariable Long id) {
 		Raid r;
 		try {
@@ -39,7 +41,7 @@ public class RaidController {
 		return ResponseEntity.ok(r);
 	}
 	
-	@GetMapping("/raids/")
+	@GetMapping
 	public List<Raid> getAllRaid() {
 		List <Raid> n;
 		n = (List<Raid>) raidRepository.findAll();
@@ -47,7 +49,7 @@ public class RaidController {
 	}
 	
 	
-	@PutMapping("/update-raid/{id}")
+	@PutMapping("/id")
 	public ResponseEntity<Raid> updateRaid(@PathVariable Long id, @RequestBody Raid r){
 		Raid r2 = raidRepository.findById(id).get();
 		if(r.getDifficulte()!=null) { r2.setDifficulte(r.getDifficulte());}
@@ -59,7 +61,7 @@ public class RaidController {
 		return ResponseEntity.ok().build();
 	}
 	
-	@DeleteMapping("/delete-raid/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Raid> deleteNourriture(@PathVariable Long id){
 		raidRepository.deleteById(id);
 		return ResponseEntity.ok().build();

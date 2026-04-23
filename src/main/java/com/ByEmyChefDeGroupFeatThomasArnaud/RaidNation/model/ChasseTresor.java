@@ -3,9 +3,8 @@ package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model;
 import jakarta.persistence.Entity;
 
 @Entity
-public class ChasseTresor extends Activite { // Hérite de l'ID d'Activite
+public class ChasseTresor extends Activite {
 	
-    // nbCartes est un champ simple, pas un ID !
     private int nbCartes; 
     private String type;
 	

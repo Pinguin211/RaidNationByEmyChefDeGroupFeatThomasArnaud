@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Raids</title>
+    <link rel="stylesheet" href="/test/style.css">
+</head>
+<body>
+<header>
+    <h1>Test API - Raidss</h1>
+    <nav>
+        <a href="/test/players">Players</a>
+        <a href="/test/classes">Classes</a>
+        <a href="/test/groupes">Groupes</a>
+		<a href="/test/raids">Groupes</a>
+    </nav>
+</header>
+
+<main>
+    <section class="left-panel">
+        <h2>Ajouter un raid</h2>
+        <p class="helper">Formulaire de creation simple.</p>
+        <div id="status" class="status"></div>
+
+        <form id="create-form">
+            <label for="nom">Nom du raid</label>
+            <input id="nom" name="nom" required>
+
+            <label for="difficulte">Difficulté (Normal / Extreme / Savage ) </label>
+            <input id="difficulte" name="difficulte" required>
+			
+			<label for="type">Type de raid (normaux, alliances, défis) </label>
+			<input id="type" name="type" required>
+			
+			<label for="isFarmSession">Session de farm</label>
+			<input type="checkbox" id="isFarmSession" name="isFarmSession">
+			
+			<label for="horaire">Horaire</label>
+			<input type="datetime-local" id="horaire" name="horaire" required>
+
+            <button type="submit">Creer le raid</button>
+        </form>
+    </section>
+
+    <section class="right-panel">
+        <h2>Liste des raids</h2>
+        <p class="helper">Suppression disponible sur chaque ligne.</p>
+        <div id="list" class="entity-list"></div>
+    </section>
+</main>
+
+<script>
+    const viewApiBase = "/test/api/raids";
+    const writeApiBase = "/api/raids";
+    const statusEl = document.getElementById("status");
+    const listEl = document.getElementById("list");
+    const formEl = document.getElementById("create-form");
+
+    function setStatus(message, ok = true) {
+        statusEl.textContent = message;
+        statusEl.className = "status " + (ok ? "ok" : "err");
+    }
+
+    async function fetchRaids() {
+        listEl.innerHTML = "";
+        const response = await fetch(viewApiBase);
+        if (!response.ok) {
+            setStatus("Impossible de charger les raids.", false);
+            return;
+        }
+
+        const raids = await response.json();
+        if (raids.length === 0) {
+            listEl.innerHTML = "<div class='entity-item'>Aucun raid.</div>";
+            return;
+        }
+
+        raids.forEach(raid => {
+            const item = document.createElement("div");
+            item.className = "entity-item";
+            item.innerHTML = `
+                <div class="entity-meta">
+                    <strong>#${raid.id} - ${raid.nom}</strong>
+                    <span>Difficulte: ${raid.difficulte}</span>
+					<span>Type: ${raid.type}</span>
+					<span>Farm: ${raid.isFarmSession}</span>
+					<span>Horaire: ${raid.horaire}</span>
+                </div>
+                <button class="delete-btn" data-id="${raid.id}">Supprimer</button>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+
+    formEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const payload = {
+			nom: formEl.nom.value,
+	        difficulte: formEl.difficulte.value,
+	        type: formEl.type.value,
+	        isFarmSession: formEl.isFarmSession.checked, 
+	        horaire: formEl.horaire.value
+        };
+
+        const response = await fetch(writeApiBase, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            setStatus("Creation echouee.", false);
+            return;
+        }
+
+        formEl.reset();
+        setStatus("raid creee.");
+        await fetchRaids();
+    });
+
+    listEl.addEventListener("click", async (event) => {
+        if (!event.target.matches(".delete-btn")) {
+            return;
+        }
+
+        const id = event.target.getAttribute("data-id");
+        const response = await fetch(`${writeApiBase}/${id}`, { method: "DELETE" });
+        if (!response.ok) {
+            setStatus("Suppression echouee.", false);
+            return;
+        }
+
+        setStatus("raid supprimee.");
+        await fetchRaids();
+    });
+
+    fetchRaids();
+</script>
+</body>
+</html>
