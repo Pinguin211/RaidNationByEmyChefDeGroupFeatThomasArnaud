@@ -1,6 +1,6 @@
 package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository;
 
-import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity.Classe;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Classe;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

@@ -1,7 +1,7 @@
 package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller;
 
-import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity.Groupe;
-import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity.Player;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Groupe;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Player;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.GroupeRepository;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.PlayerRepository;
 import org.springframework.http.HttpStatus;
