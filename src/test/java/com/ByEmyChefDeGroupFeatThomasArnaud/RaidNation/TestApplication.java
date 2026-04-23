@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
 
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller.ChasseViewController;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller.ClasseViewController;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller.GroupeViewController;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller.PlayerViewController;
@@ -29,6 +30,7 @@ public class TestApplication {
             GroupeViewController.class,
             TestPageController.class,
             RaidViewController.class,
+            ChasseViewController.class
     })
     static class TestConfig {
         // Ajouter ici des beans/configs specifiques test si necessaire.

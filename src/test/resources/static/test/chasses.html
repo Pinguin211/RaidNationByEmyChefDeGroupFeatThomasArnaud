@@ -13,7 +13,8 @@
         <a href="/test/players">Players</a>
         <a href="/test/classes">Classes</a>
         <a href="/test/groupes">Groupes</a>
-		<a href="/test/chasses">Groupes</a>
+		<a href="/test/raids">Raids</a>
+		<a href="/test/chasses">Chasses aux trésors</a>
     </nav>
 </header>
 
@@ -25,19 +26,16 @@
 
         <form id="create-form">
 			
-			<label for="type">Type de chasse (normaux, alliances, défis) </label>
+			<label for="type">Type de cartes (Extension,Nom etc...) </label>
 			<input id="type" name="type" required>
 			
-			<label for="type"> </label>
-			<input id="type" name="type" required>
+			<label for="nbCartes">Nombre de cartes :</label>
+			<input type="number" id="nbCartes" name="nbCartes" min="1" step="1" required>
 			
-			<label for="role">Session de farm</label>
-			<input type="checkbox" id="isFarmSession" name="isFarmSession">
-			
-			<label for="role">Horaire</label>
+			<label for="horaire">Horaire</label>
 			<input type="datetime-local" id="horaire" name="horaire" required>
 
-            <button type="submit">Creer le chasse</button>
+            <button type="submit">Creer la chasse aux trésors</button>
         </form>
     </section>
 
@@ -79,10 +77,8 @@
             item.className = "entity-item";
             item.innerHTML = `
                 <div class="entity-meta">
-                    <strong>#${chasse.id} - ${chasse.nom}</strong>
-                    <span>Difficulte: ${chasse.difficulte}</span>
-					<span>Type: ${chasse.type}</span>
-					<span>Farm: ${chasse.isFarmSession}</span>
+                    <strong>#${chasse.id} - ${chasse.type}</strong>
+                    <span>Difficulte: ${chasse.nbCartes}</span>
 					<span>Horaire: ${chasse.horaire}</span>
                 </div>
                 <button class="delete-btn" data-id="${chasse.id}">Supprimer</button>
@@ -94,10 +90,8 @@
     formEl.addEventListener("submit", async (event) => {
         event.preventDefault();
         const payload = {
-			nom: formEl.nom.value,
-	        difficulte: formEl.difficulte.value,
+	        nbCartes: formEl.nbCartes.value,
 	        type: formEl.type.value,
-	        isFarmSession: formEl.isFarmSession.checked, 
 	        horaire: formEl.horaire.value
         };
 

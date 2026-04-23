@@ -59,4 +59,16 @@ public class TestPageController {
     public String testRaidsPage() {
         return "forward:/test/raids.html";
     }
+    
+    /**
+     * Redirige vers la page de test chassess.
+     *
+     * @return forward vers la page chasses
+     */
+    @GetMapping({"/test/chasses", "/test/chasses/"})
+    public String testChassesPage() {
+        return "forward:/test/chasses.html";
+    }
+    
+    
 }

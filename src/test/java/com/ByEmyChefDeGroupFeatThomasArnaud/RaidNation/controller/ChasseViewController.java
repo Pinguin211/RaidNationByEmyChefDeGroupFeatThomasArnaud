@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.ChasseRepository;
 
 @RestController
-@RequestMapping("/test/api/chasse")
+@RequestMapping("/test/api/chasses")
 public class ChasseViewController {
 
 	private final ChasseRepository chasseRepository;
