@@ -4,6 +4,8 @@ import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Groupe;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Player;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.GroupeRepository;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.PlayerRepository;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.ActiviteRepository;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Activite;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,10 +24,12 @@ public class GroupeController {
 
     private final GroupeRepository groupeRepository;
     private final PlayerRepository playerRepository;
+    private final ActiviteRepository activiteRepository;
 
-    public GroupeController(GroupeRepository groupeRepository, PlayerRepository playerRepository) {
+    public GroupeController(GroupeRepository groupeRepository, PlayerRepository playerRepository, ActiviteRepository activiteRepository) {
         this.groupeRepository = groupeRepository;
         this.playerRepository = playerRepository;
+        this.activiteRepository = activiteRepository;
     }
 
     /**
@@ -134,5 +138,54 @@ public class GroupeController {
         return groupeRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+    
+    /**
+     * Associe une activite (Raid/Chasse) a un groupe.
+     *
+     * @param groupeId identifiant du groupe
+     * @param activiteId identifiant de l'activite (Attention, c'est un Long)
+     * @return 204 si associe, 404 si une entite est absente
+     */
+    @PostMapping("/{groupeId}/activites/{activiteId}")
+    @Transactional
+    public ResponseEntity<Void> addActiviteToGroupe(@PathVariable Integer groupeId, @PathVariable Long activiteId) {
+        Groupe groupe = groupeRepository.findById(groupeId).orElse(null);
+        Activite activite = activiteRepository.findById(activiteId).orElse(null);
+
+        if (groupe == null || activite == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // On lie les deux côtés de la relation Many-To-Many
+        groupe.getActivites().add(activite);
+        activite.getGroupes().add(groupe);
+        
+        // On sauvegarde le propriétaire de la relation (le groupe)
+        groupeRepository.save(groupe);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Retire l'association entre un groupe et une activite.
+     */
+    @DeleteMapping("/{groupeId}/activites/{activiteId}")
+    @Transactional
+    public ResponseEntity<Void> removeActiviteFromGroupe(@PathVariable Integer groupeId, @PathVariable Long activiteId) {
+        Groupe groupe = groupeRepository.findById(groupeId).orElse(null);
+        Activite activite = activiteRepository.findById(activiteId).orElse(null);
+
+        if (groupe == null || activite == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // On casse le lien des deux côtés
+        groupe.getActivites().remove(activite);
+        activite.getGroupes().remove(groupe);
+        
+        groupeRepository.save(groupe);
+
+        return ResponseEntity.noContent().build();
     }
 }

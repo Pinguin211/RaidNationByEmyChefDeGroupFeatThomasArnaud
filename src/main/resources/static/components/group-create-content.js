@@ -5,7 +5,7 @@ class GroupCreateContent extends HTMLElement {
                 <header class="page-header">
                     <div>
                         <h1>Groupes disponibles</h1>
-                        <p>Gère la liste des groupes et assigne les joueurs.</p>
+                        <p>Gère la liste des groupes, leurs joueurs et leurs activités.</p>
                     </div>
                     <button id="open-modal-btn" class="primary-btn" type="button">Ajouter un groupe</button>
                 </header>
@@ -16,7 +16,7 @@ class GroupCreateContent extends HTMLElement {
                         <tr>
                             <th>ID</th>
                             <th>Nom</th>
-                            <th>Membres</th>
+                            <th>Membres & Activités</th>
                             <th>Options</th>
                         </tr>
                         </thead>
@@ -64,8 +64,22 @@ class GroupCreateContent extends HTMLElement {
                 </div>
             </div>
 
+            <div id="activite-modal" class="modal-backdrop hidden" aria-hidden="true">
+                <div class="modal-card" role="dialog" aria-modal="true">
+                    <div class="modal-header">
+                        <h2 id="activite-modal-title">Inscrire à une activité</h2>
+                        <button id="close-activite-modal-btn" class="icon-btn" type="button" aria-label="Fermer">×</button>
+                    </div>
+                    <div class="assign-list-container">
+                        <div id="activites-list" class="players-list">
+                            <p class="empty-row">Chargement des activités...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <style>
-                /* --- CSS de base conservé --- */
+                /* --- CSS de base --- */
                 .class-create-content { max-width: 980px; width: 100%; background: #ffffff; border: 1px solid #dbe4ef; border-radius: 16px; box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08); padding: 28px; }
                 .page-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
                 .page-header h1 { margin: 0 0 6px 0; font-size: 30px; color: #0f172a; }
@@ -80,12 +94,15 @@ class GroupCreateContent extends HTMLElement {
                 tbody tr:last-child td { border-bottom: none; }
                 .empty-row { text-align: center; color: #64748b; }
                 
-                /* --- Nouveaux Boutons --- */
+                /* --- Boutons et Badges --- */
                 .delete-btn { border: none; background: #dc2626; color: #ffffff; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
                 .delete-btn:hover { background: #b91c1c; }
                 .assign-btn { border: none; background: #0ea5e9; color: #ffffff; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 6px; }
                 .assign-btn:hover { background: #0284c7; }
-                .badge { background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+                .activite-btn { border: none; background: #8b5cf6; color: #ffffff; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 6px; }
+                .activite-btn:hover { background: #7c3aed; }
+                .badge { background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block; margin-bottom: 4px;}
+                .badge-act { background: #e0e7ff; color: #3730a3; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block; }
                 
                 /* --- CSS Modales --- */
                 .global-message { min-height: 20px; margin-top: 12px; font-weight: 600; }
@@ -107,11 +124,13 @@ class GroupCreateContent extends HTMLElement {
                 .error { color: #b91c1c; min-height: 16px; font-size: 13px; }
                 .actions { display: flex; justify-content: flex-end; }
                 
-                /* --- CSS Liste Joueurs (Modale 2) --- */
+                /* --- CSS Listes (Joueurs & Activités) --- */
                 .assign-list-container { max-height: 350px; overflow-y: auto; padding-right: 8px; margin-top: 15px; }
                 .players-list { display: flex; flex-direction: column; gap: 10px; }
                 .player-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; }
                 .player-name { font-weight: 600; color: #0f172a; }
+                .act-info { display: flex; flex-direction: column; }
+                .act-type { font-size: 12px; color: #64748b; }
                 .btn-add { background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
                 .btn-add:hover { background: #15803d; }
                 .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
@@ -119,7 +138,7 @@ class GroupCreateContent extends HTMLElement {
             </style>
         `;
 
-        // Éléments du DOM
+        // --- Récupération des éléments du DOM ---
         const tableBody = this.querySelector("#groupes-table-body");
         const openModalBtn = this.querySelector("#open-modal-btn");
         const closeModalBtn = this.querySelector("#close-modal-btn");
@@ -128,11 +147,15 @@ class GroupCreateContent extends HTMLElement {
         const nomInput = this.querySelector("#nom");
         const messageEl = this.querySelector("#global-message");
 
-        // Éléments pour l'assignation
         const assignModal = this.querySelector("#assign-modal");
         const closeAssignModalBtn = this.querySelector("#close-assign-modal-btn");
         const playersListEl = this.querySelector("#players-list");
         const assignModalTitle = this.querySelector("#assign-modal-title");
+
+        const activiteModal = this.querySelector("#activite-modal");
+        const closeActiviteModalBtn = this.querySelector("#close-activite-modal-btn");
+        const activitesListEl = this.querySelector("#activites-list");
+        const activiteModalTitle = this.querySelector("#activite-modal-title");
 
         // Données en mémoire
         let currentGroupes = [];
@@ -149,7 +172,7 @@ class GroupCreateContent extends HTMLElement {
             messageEl.textContent = message;
             messageEl.className = "global-message";
             if (type) messageEl.classList.add(type);
-            setTimeout(() => messageEl.textContent = "", 4000); // Disparaît après 4s
+            setTimeout(() => messageEl.textContent = "", 4000); 
         };
 
         const validateField = (field) => {
@@ -161,7 +184,7 @@ class GroupCreateContent extends HTMLElement {
             return true;
         };
 
-        // --- Modale Création ---
+        // --- Modale 1 : Création ---
         const openModal = () => {
             modal.classList.remove("hidden");
             nomInput.focus();
@@ -173,7 +196,7 @@ class GroupCreateContent extends HTMLElement {
             setFieldError(nomInput, "");
         };
 
-        // --- Modale Assignation ---
+        // --- Modale 2 : Joueurs ---
         const openAssignModal = async (groupId) => {
             selectedGroupId = groupId;
             const group = currentGroupes.find(g => g.id == groupId);
@@ -187,18 +210,15 @@ class GroupCreateContent extends HTMLElement {
             selectedGroupId = null;
         };
 
-        // Rendu des joueurs dans la modale d'assignation
         const renderPlayersList = async () => {
             try {
                 const response = await fetch("/api/players");
                 const allPlayers = await response.json();
                 const group = currentGroupes.find(g => g.id == selectedGroupId);
-                
-                // Récupérer les IDs des joueurs déjà dans ce groupe
                 const playersInGroupIds = group.players ? group.players.map(p => p.id) : [];
 
                 if (allPlayers.length === 0) {
-                    playersListEl.innerHTML = `<p class="empty-row">Aucun joueur dans la base de données. Allez en créer un !</p>`;
+                    playersListEl.innerHTML = `<p class="empty-row">Aucun joueur dans la base de données.</p>`;
                     return;
                 }
 
@@ -208,8 +228,8 @@ class GroupCreateContent extends HTMLElement {
                         <div class="player-item">
                             <span class="player-name">${player.nom}</span>
                             ${isInGroup 
-                                ? `<button class="btn-remove" data-action="remove" data-pid="${player.id}">Retirer</button>`
-                                : `<button class="btn-add" data-action="add" data-pid="${player.id}">Ajouter</button>`
+                                ? `<button class="btn-remove" data-action="remove-player" data-pid="${player.id}">Retirer</button>`
+                                : `<button class="btn-add" data-action="add-player" data-pid="${player.id}">Ajouter</button>`
                             }
                         </div>
                     `;
@@ -220,26 +240,85 @@ class GroupCreateContent extends HTMLElement {
             }
         };
 
-        // Gérer le clic sur Ajouter/Retirer
         playersListEl.addEventListener("click", async (e) => {
             const action = e.target.getAttribute("data-action");
             const playerId = e.target.getAttribute("data-pid");
-            
             if (!action || !playerId) return;
 
-            const method = action === "add" ? "POST" : "DELETE";
+            const method = action === "add-player" ? "POST" : "DELETE";
             try {
                 const response = await fetch(`/api/groupes/${selectedGroupId}/players/${playerId}`, { method });
                 if (response.ok) {
-                    await loadGroupes(); // Recharge les groupes pour mettre à jour les membres
-                    await renderPlayersList(); // Rafraîchit les boutons de la modale
-                } else {
-                    alert("Erreur lors de l'opération.");
-                }
-            } catch (err) {
-                alert("Erreur réseau.");
-            }
+                    await loadGroupes(); 
+                    await renderPlayersList(); 
+                } else { alert("Erreur lors de l'opération."); }
+            } catch (err) { alert("Erreur réseau."); }
         });
+
+        // --- Modale 3 : Activités ---
+        const openActiviteModal = async (groupId) => {
+            selectedGroupId = groupId;
+            const group = currentGroupes.find(g => g.id == groupId);
+            activiteModalTitle.textContent = `Activités : ${group.nom}`;
+            activiteModal.classList.remove("hidden");
+            await renderActivitesList();
+        };
+
+        const closeActiviteModal = () => {
+            activiteModal.classList.add("hidden");
+            selectedGroupId = null;
+        };
+
+        const renderActivitesList = async () => {
+            try {
+                const response = await fetch("/api/activites");
+                const allActivites = await response.json();
+                const group = currentGroupes.find(g => g.id == selectedGroupId);
+                const activitesInGroupIds = group.activites ? group.activites.map(a => a.id) : [];
+
+                if (allActivites.length === 0) {
+                    activitesListEl.innerHTML = `<p class="empty-row">Aucune activité trouvée.</p>`;
+                    return;
+                }
+
+                activitesListEl.innerHTML = allActivites.map(act => {
+                    const isInGroup = activitesInGroupIds.includes(act.id);
+                    // On gère l'affichage du type s'il existe (pour différencier Raid et Chasse)
+                    const typeLabel = act.type ? act.type : "Activité";
+                    return `
+                        <div class="player-item">
+                            <div class="act-info">
+                                <span class="player-name">Activité #${act.id}</span>
+                                <span class="act-type">${typeLabel}</span>
+                            </div>
+                            ${isInGroup 
+                                ? `<button class="btn-remove" data-action="remove-act" data-aid="${act.id}">Retirer</button>`
+                                : `<button class="btn-add" data-action="add-act" data-aid="${act.id}">Inscrire</button>`
+                            }
+                        </div>
+                    `;
+                }).join("");
+
+            } catch (error) {
+                activitesListEl.innerHTML = `<p class="error">Erreur lors du chargement des activités.</p>`;
+            }
+        };
+
+        activitesListEl.addEventListener("click", async (e) => {
+            const action = e.target.getAttribute("data-action");
+            const activiteId = e.target.getAttribute("data-aid");
+            if (!action || !activiteId) return;
+
+            const method = action === "add-act" ? "POST" : "DELETE";
+            try {
+                const response = await fetch(`/api/groupes/${selectedGroupId}/activites/${activiteId}`, { method });
+                if (response.ok) {
+                    await loadGroupes(); 
+                    await renderActivitesList(); 
+                } else { alert("Erreur lors de l'opération."); }
+            } catch (err) { alert("Erreur réseau."); }
+        });
+
 
         // --- Tableau principal ---
         const renderRows = (groupes) => {
@@ -250,13 +329,18 @@ class GroupCreateContent extends HTMLElement {
 
             tableBody.innerHTML = groupes.map((groupe) => {
                 const nbJoueurs = groupe.players ? groupe.players.length : 0;
+                const nbActivites = groupe.activites ? groupe.activites.length : 0;
                 return `
                     <tr>
                         <td>${groupe.id}</td>
                         <td><strong>${groupe.nom}</strong></td>
-                        <td><span class="badge">${nbJoueurs} joueur(s)</span></td>
+                        <td>
+                            <span class="badge">${nbJoueurs} joueur(s)</span><br/>
+                            <span class="badge-act">${nbActivites} activité(s)</span>
+                        </td>
                         <td>
                             <button class="assign-btn" data-assign-id="${groupe.id}">Joueurs</button>
+                            <button class="activite-btn" data-act-id="${groupe.id}">Activités</button>
                             <button class="delete-btn" data-id="${groupe.id}">Supprimer</button>
                         </td>
                     </tr>
@@ -287,14 +371,16 @@ class GroupCreateContent extends HTMLElement {
             }
         };
 
-        // --- Events Listeners ---
+        // --- Events Listeners de base ---
         openModalBtn.addEventListener("click", openModal);
         closeModalBtn.addEventListener("click", closeModal);
         closeAssignModalBtn.addEventListener("click", closeAssignModal);
+        closeActiviteModalBtn.addEventListener("click", closeActiviteModal);
         
         // Fermer les modales en cliquant à l'extérieur
         modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
         assignModal.addEventListener("click", (e) => { if (e.target === assignModal) closeAssignModal(); });
+        activiteModal.addEventListener("click", (e) => { if (e.target === activiteModal) closeActiviteModal(); });
 
         nomInput.addEventListener("input", () => validateField(nomInput));
 
@@ -320,15 +406,17 @@ class GroupCreateContent extends HTMLElement {
         });
 
         tableBody.addEventListener("click", async (event) => {
-            // Bouton Supprimer
             if (event.target.matches(".delete-btn")) {
                 const id = event.target.getAttribute("data-id");
                 if (confirm("Supprimer ce groupe ?")) await deleteGroupe(id);
             }
-            // Bouton Joueurs (Assignation)
             if (event.target.matches(".assign-btn")) {
                 const id = event.target.getAttribute("data-assign-id");
                 await openAssignModal(id);
+            }
+            if (event.target.matches(".activite-btn")) {
+                const id = event.target.getAttribute("data-act-id");
+                await openActiviteModal(id);
             }
         });
 
