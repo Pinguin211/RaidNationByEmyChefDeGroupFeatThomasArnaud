@@ -29,4 +29,9 @@ public class MainPageController {
     public String classesPage() {
         return "forward:/classes.html";
     }
+    
+    @GetMapping("/groupes")
+    public String groupesPage() {
+        return "forward:/groupes.html";
+    }
 }
