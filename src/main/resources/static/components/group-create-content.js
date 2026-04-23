@@ -5,9 +5,9 @@ class GroupCreateContent extends HTMLElement {
                 <header class="page-header">
                     <div>
                         <h1>Groupes disponibles</h1>
-                        <p>Gère la liste des groupes de l'application.</p>
+                        <p>Gère la liste des groupes et assigne les joueurs.</p>
                     </div>
-                    <button id="open-modal-btn" class="primary-btn" type="button">Ajouter</button>
+                    <button id="open-modal-btn" class="primary-btn" type="button">Ajouter un groupe</button>
                 </header>
 
                 <div class="table-wrapper">
@@ -16,12 +16,13 @@ class GroupCreateContent extends HTMLElement {
                         <tr>
                             <th>ID</th>
                             <th>Nom</th>
+                            <th>Membres</th>
                             <th>Options</th>
                         </tr>
                         </thead>
                         <tbody id="groupes-table-body">
                         <tr>
-                            <td colspan="3" class="empty-row">Chargement...</td>
+                            <td colspan="4" class="empty-row">Chargement...</td>
                         </tr>
                         </tbody>
                     </table>
@@ -36,21 +37,35 @@ class GroupCreateContent extends HTMLElement {
                         <h2 id="modal-title">Ajouter un groupe</h2>
                         <button id="close-modal-btn" class="icon-btn" type="button" aria-label="Fermer">×</button>
                     </div>
-
                     <form id="groupe-create-form" novalidate>
                         <div class="field">
                             <label for="nom">Nom du groupe</label>
                             <input id="nom" name="nom" type="text" placeholder="Ex: Les tryharders" required maxlength="60">
                             <small class="error" data-error-for="nom"></small>
                         </div>
-
                         <div class="actions">
                             <button class="primary-btn" type="submit">Créer le groupe</button>
                         </div>
                     </form>
                 </div>
             </div>
+
+            <div id="assign-modal" class="modal-backdrop hidden" aria-hidden="true">
+                <div class="modal-card" role="dialog" aria-modal="true">
+                    <div class="modal-header">
+                        <h2 id="assign-modal-title">Gérer les joueurs</h2>
+                        <button id="close-assign-modal-btn" class="icon-btn" type="button" aria-label="Fermer">×</button>
+                    </div>
+                    <div class="assign-list-container">
+                        <div id="players-list" class="players-list">
+                            <p class="empty-row">Chargement des joueurs...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <style>
+                /* --- CSS de base conservé --- */
                 .class-create-content { max-width: 980px; width: 100%; background: #ffffff; border: 1px solid #dbe4ef; border-radius: 16px; box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08); padding: 28px; }
                 .page-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
                 .page-header h1 { margin: 0 0 6px 0; font-size: 30px; color: #0f172a; }
@@ -64,8 +79,15 @@ class GroupCreateContent extends HTMLElement {
                 th { color: #334155; font-weight: 700; font-size: 14px; }
                 tbody tr:last-child td { border-bottom: none; }
                 .empty-row { text-align: center; color: #64748b; }
+                
+                /* --- Nouveaux Boutons --- */
                 .delete-btn { border: none; background: #dc2626; color: #ffffff; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
                 .delete-btn:hover { background: #b91c1c; }
+                .assign-btn { border: none; background: #0ea5e9; color: #ffffff; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 6px; }
+                .assign-btn:hover { background: #0284c7; }
+                .badge { background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+                
+                /* --- CSS Modales --- */
                 .global-message { min-height: 20px; margin-top: 12px; font-weight: 600; }
                 .global-message.success { color: #166534; }
                 .global-message.error { color: #b91c1c; }
@@ -84,9 +106,20 @@ class GroupCreateContent extends HTMLElement {
                 input.invalid { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12); }
                 .error { color: #b91c1c; min-height: 16px; font-size: 13px; }
                 .actions { display: flex; justify-content: flex-end; }
+                
+                /* --- CSS Liste Joueurs (Modale 2) --- */
+                .assign-list-container { max-height: 350px; overflow-y: auto; padding-right: 8px; margin-top: 15px; }
+                .players-list { display: flex; flex-direction: column; gap: 10px; }
+                .player-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; }
+                .player-name { font-weight: 600; color: #0f172a; }
+                .btn-add { background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+                .btn-add:hover { background: #15803d; }
+                .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+                .btn-remove:hover { background: #dc2626; }
             </style>
         `;
 
+        // Éléments du DOM
         const tableBody = this.querySelector("#groupes-table-body");
         const openModalBtn = this.querySelector("#open-modal-btn");
         const closeModalBtn = this.querySelector("#close-modal-btn");
@@ -95,25 +128,32 @@ class GroupCreateContent extends HTMLElement {
         const nomInput = this.querySelector("#nom");
         const messageEl = this.querySelector("#global-message");
 
+        // Éléments pour l'assignation
+        const assignModal = this.querySelector("#assign-modal");
+        const closeAssignModalBtn = this.querySelector("#close-assign-modal-btn");
+        const playersListEl = this.querySelector("#players-list");
+        const assignModalTitle = this.querySelector("#assign-modal-title");
+
+        // Données en mémoire
+        let currentGroupes = [];
+        let selectedGroupId = null;
+
+        // --- Utilitaires ---
         const setFieldError = (field, message) => {
             const errorEl = this.querySelector(`[data-error-for="${field.name}"]`);
-            if (errorEl) {
-                errorEl.textContent = message;
-            }
+            if (errorEl) errorEl.textContent = message;
             field.classList.toggle("invalid", Boolean(message));
         };
 
         const showMessage = (message, type = "") => {
             messageEl.textContent = message;
             messageEl.className = "global-message";
-            if (type) {
-                messageEl.classList.add(type);
-            }
+            if (type) messageEl.classList.add(type);
+            setTimeout(() => messageEl.textContent = "", 4000); // Disparaît après 4s
         };
 
         const validateField = (field) => {
-            const value = field.value.trim();
-            if (value.length < 2) {
+            if (field.value.trim().length < 2) {
                 setFieldError(field, "Minimum 2 caractères.");
                 return false;
             }
@@ -121,53 +161,115 @@ class GroupCreateContent extends HTMLElement {
             return true;
         };
 
+        // --- Modale Création ---
         const openModal = () => {
             modal.classList.remove("hidden");
-            modal.setAttribute("aria-hidden", "false");
             nomInput.focus();
         };
 
         const closeModal = () => {
             modal.classList.add("hidden");
-            modal.setAttribute("aria-hidden", "true");
             form.reset();
             setFieldError(nomInput, "");
         };
 
+        // --- Modale Assignation ---
+        const openAssignModal = async (groupId) => {
+            selectedGroupId = groupId;
+            const group = currentGroupes.find(g => g.id == groupId);
+            assignModalTitle.textContent = `Joueurs : ${group.nom}`;
+            assignModal.classList.remove("hidden");
+            await renderPlayersList();
+        };
+
+        const closeAssignModal = () => {
+            assignModal.classList.add("hidden");
+            selectedGroupId = null;
+        };
+
+        // Rendu des joueurs dans la modale d'assignation
+        const renderPlayersList = async () => {
+            try {
+                const response = await fetch("/api/players");
+                const allPlayers = await response.json();
+                const group = currentGroupes.find(g => g.id == selectedGroupId);
+                
+                // Récupérer les IDs des joueurs déjà dans ce groupe
+                const playersInGroupIds = group.players ? group.players.map(p => p.id) : [];
+
+                if (allPlayers.length === 0) {
+                    playersListEl.innerHTML = `<p class="empty-row">Aucun joueur dans la base de données. Allez en créer un !</p>`;
+                    return;
+                }
+
+                playersListEl.innerHTML = allPlayers.map(player => {
+                    const isInGroup = playersInGroupIds.includes(player.id);
+                    return `
+                        <div class="player-item">
+                            <span class="player-name">${player.nom}</span>
+                            ${isInGroup 
+                                ? `<button class="btn-remove" data-action="remove" data-pid="${player.id}">Retirer</button>`
+                                : `<button class="btn-add" data-action="add" data-pid="${player.id}">Ajouter</button>`
+                            }
+                        </div>
+                    `;
+                }).join("");
+
+            } catch (error) {
+                playersListEl.innerHTML = `<p class="error">Erreur lors du chargement des joueurs.</p>`;
+            }
+        };
+
+        // Gérer le clic sur Ajouter/Retirer
+        playersListEl.addEventListener("click", async (e) => {
+            const action = e.target.getAttribute("data-action");
+            const playerId = e.target.getAttribute("data-pid");
+            
+            if (!action || !playerId) return;
+
+            const method = action === "add" ? "POST" : "DELETE";
+            try {
+                const response = await fetch(`/api/groupes/${selectedGroupId}/players/${playerId}`, { method });
+                if (response.ok) {
+                    await loadGroupes(); // Recharge les groupes pour mettre à jour les membres
+                    await renderPlayersList(); // Rafraîchit les boutons de la modale
+                } else {
+                    alert("Erreur lors de l'opération.");
+                }
+            } catch (err) {
+                alert("Erreur réseau.");
+            }
+        });
+
+        // --- Tableau principal ---
         const renderRows = (groupes) => {
             if (!Array.isArray(groupes) || groupes.length === 0) {
-                tableBody.innerHTML = `
-                    <tr>
-                        <td colspan="3" class="empty-row">Aucun groupe disponible.</td>
-                    </tr>
-                `;
+                tableBody.innerHTML = `<tr><td colspan="4" class="empty-row">Aucun groupe disponible.</td></tr>`;
                 return;
             }
 
-            tableBody.innerHTML = groupes
-                .map((groupe) => `
+            tableBody.innerHTML = groupes.map((groupe) => {
+                const nbJoueurs = groupe.players ? groupe.players.length : 0;
+                return `
                     <tr>
-                        <td>${groupe.id ?? "-"}</td>
-                        <td>${groupe.nom ?? "-"}</td>
+                        <td>${groupe.id}</td>
+                        <td><strong>${groupe.nom}</strong></td>
+                        <td><span class="badge">${nbJoueurs} joueur(s)</span></td>
                         <td>
+                            <button class="assign-btn" data-assign-id="${groupe.id}">Joueurs</button>
                             <button class="delete-btn" data-id="${groupe.id}">Supprimer</button>
                         </td>
                     </tr>
-                `)
-                .join("");
+                `;
+            }).join("");
         };
 
         const loadGroupes = async () => {
             try {
-                // Attention : L'URL correspond bien à ton @RequestMapping("/groupes")
                 const response = await fetch("/api/groupes");
-                if (!response.ok) {
-                    renderRows([]);
-                    showMessage("Impossible de charger les groupes.", "error");
-                    return;
-                }
-                const data = await response.json();
-                renderRows(data);
+                if (!response.ok) throw new Error();
+                currentGroupes = await response.json();
+                renderRows(currentGroupes);
             } catch (error) {
                 renderRows([]);
                 showMessage("Erreur réseau lors du chargement des groupes.", "error");
@@ -176,71 +278,61 @@ class GroupCreateContent extends HTMLElement {
 
         const deleteGroupe = async (id) => {
             try {
-                const response = await fetch(`/groupes/${id}`, { method: "DELETE" });
-                if (!response.ok) {
-                    showMessage("Suppression impossible.", "error");
-                    return;
-                }
+                const response = await fetch(`/api/groupes/${id}`, { method: "DELETE" });
+                if (!response.ok) throw new Error();
                 showMessage("Groupe supprimé.", "success");
                 await loadGroupes();
             } catch (error) {
-                showMessage("Erreur réseau pendant la suppression.", "error");
+                showMessage("Erreur pendant la suppression.", "error");
             }
         };
 
+        // --- Events Listeners ---
         openModalBtn.addEventListener("click", openModal);
         closeModalBtn.addEventListener("click", closeModal);
-        modal.addEventListener("click", (event) => {
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
+        closeAssignModalBtn.addEventListener("click", closeAssignModal);
+        
+        // Fermer les modales en cliquant à l'extérieur
+        modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+        assignModal.addEventListener("click", (e) => { if (e.target === assignModal) closeAssignModal(); });
 
         nomInput.addEventListener("input", () => validateField(nomInput));
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
-
-            const isNomValid = validateField(nomInput);
-            if (!isNomValid) {
-                return;
-            }
-
-            const payload = {
-                nom: nomInput.value.trim()
-            };
+            if (!validateField(nomInput)) return;
 
             try {
                 const response = await fetch("/api/groupes", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({ nom: nomInput.value.trim() })
                 });
 
-                if (!response.ok) {
-                    showMessage("Création impossible. Vérifie les informations.", "error");
-                    return;
-                }
+                if (!response.ok) throw new Error();
 
                 closeModal();
                 showMessage("Groupe créé avec succès.", "success");
                 await loadGroupes();
             } catch (error) {
-                showMessage("Erreur réseau pendant la création.", "error");
+                showMessage("Erreur pendant la création.", "error");
             }
         });
 
         tableBody.addEventListener("click", async (event) => {
-            if (!event.target.matches(".delete-btn")) {
-                return;
+            // Bouton Supprimer
+            if (event.target.matches(".delete-btn")) {
+                const id = event.target.getAttribute("data-id");
+                if (confirm("Supprimer ce groupe ?")) await deleteGroupe(id);
             }
-            const id = event.target.getAttribute("data-id");
-            if (!id) {
-                return;
+            // Bouton Joueurs (Assignation)
+            if (event.target.matches(".assign-btn")) {
+                const id = event.target.getAttribute("data-assign-id");
+                await openAssignModal(id);
             }
-            await deleteGroupe(id);
         });
 
+        // Chargement initial
         loadGroupes();
     }
 }
