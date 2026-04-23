@@ -2,55 +2,227 @@ class ClassCreateContent extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
             <section class="class-create-content">
-                <header>
-                    <h1>Ajouter une classe</h1>
-                    <p>Cree une nouvelle classe avec verification client avant envoi.</p>
+                <header class="page-header">
+                    <div>
+                        <h1>Classes disponibles</h1>
+                        <p>Gere la liste des classes de l'application.</p>
+                    </div>
+                    <button id="open-modal-btn" class="primary-btn" type="button">Ajouter</button>
                 </header>
 
-                <form id="class-create-form" novalidate>
-                    <div class="field">
-                        <label for="nom">Nom de la classe</label>
-                        <input id="nom" name="nom" type="text" placeholder="Ex: Guerrier" required maxlength="60">
-                        <small class="error" data-error-for="nom"></small>
-                    </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Role</th>
+                            <th>Options</th>
+                        </tr>
+                        </thead>
+                        <tbody id="classes-table-body">
+                        <tr>
+                            <td colspan="4" class="empty-row">Chargement...</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                    <div class="field">
-                        <label for="role">Role de la classe</label>
-                        <input id="role" name="role" type="text" placeholder="Ex: Tank" required maxlength="40">
-                        <small class="error" data-error-for="role"></small>
-                    </div>
-
-                    <div class="actions">
-                        <button type="submit">Creer la classe</button>
-                    </div>
-                    <p id="global-message" class="global-message"></p>
-                </form>
+                <p id="global-message" class="global-message"></p>
             </section>
+
+            <div id="class-modal" class="modal-backdrop hidden" aria-hidden="true">
+                <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                    <div class="modal-header">
+                        <h2 id="modal-title">Ajouter une classe</h2>
+                        <button id="close-modal-btn" class="icon-btn" type="button" aria-label="Fermer">×</button>
+                    </div>
+
+                    <form id="class-create-form" novalidate>
+                        <div class="field">
+                            <label for="nom">Nom de la classe</label>
+                            <input id="nom" name="nom" type="text" placeholder="Ex: Guerrier" required maxlength="60">
+                            <small class="error" data-error-for="nom"></small>
+                        </div>
+
+                        <div class="field">
+                            <label for="role">Role de la classe</label>
+                            <input id="role" name="role" type="text" placeholder="Ex: Tank" required maxlength="40">
+                            <small class="error" data-error-for="role"></small>
+                        </div>
+
+                        <div class="actions">
+                            <button class="primary-btn" type="submit">Creer la classe</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
             <style>
                 .class-create-content {
-                    max-width: 860px;
+                    max-width: 980px;
                     width: 100%;
                     background: #ffffff;
                     border: 1px solid #dbe4ef;
                     border-radius: 16px;
                     box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
-                    padding: 30px;
+                    padding: 28px;
                 }
 
-                .class-create-content h1 {
-                    margin: 0 0 8px 0;
-                    font-size: 32px;
+                .page-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 16px;
+                    margin-bottom: 18px;
                 }
 
-                .class-create-content p {
+                .page-header h1 {
+                    margin: 0 0 6px 0;
+                    font-size: 30px;
+                    color: #0f172a;
+                }
+
+                .page-header p {
                     margin: 0;
                     color: #475569;
                 }
 
+                .primary-btn {
+                    border: none;
+                    background: #2563eb;
+                    color: #ffffff;
+                    padding: 11px 16px;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25);
+                }
+
+                .primary-btn:hover {
+                    background: #1d4ed8;
+                }
+
+                .table-wrapper {
+                    border: 1px solid #dbe4ef;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    background: #ffffff;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                thead {
+                    background: #f8fafc;
+                }
+
+                th, td {
+                    padding: 13px 14px;
+                    text-align: left;
+                    border-bottom: 1px solid #e2e8f0;
+                }
+
+                th {
+                    color: #334155;
+                    font-weight: 700;
+                    font-size: 14px;
+                }
+
+                tbody tr:last-child td {
+                    border-bottom: none;
+                }
+
+                .empty-row {
+                    text-align: center;
+                    color: #64748b;
+                }
+
+                .delete-btn {
+                    border: none;
+                    background: #dc2626;
+                    color: #ffffff;
+                    padding: 8px 10px;
+                    border-radius: 8px;
+                    font-weight: 700;
+                    cursor: pointer;
+                }
+
+                .delete-btn:hover {
+                    background: #b91c1c;
+                }
+
+                .global-message {
+                    min-height: 20px;
+                    margin-top: 12px;
+                    font-weight: 600;
+                }
+
+                .global-message.success {
+                    color: #166534;
+                }
+
+                .global-message.error {
+                    color: #b91c1c;
+                }
+
+                .modal-backdrop {
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(15, 23, 42, 0.52);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 20px;
+                    z-index: 20;
+                }
+
+                .modal-backdrop.hidden {
+                    display: none;
+                }
+
+                .modal-card {
+                    width: 100%;
+                    max-width: 520px;
+                    background: #ffffff;
+                    border-radius: 14px;
+                    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28);
+                    border: 1px solid #dbe4ef;
+                    padding: 20px;
+                }
+
+                .modal-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 12px;
+                }
+
+                .modal-header h2 {
+                    margin: 0;
+                    font-size: 24px;
+                }
+
+                .icon-btn {
+                    border: none;
+                    background: #e2e8f0;
+                    color: #334155;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    font-size: 22px;
+                    line-height: 1;
+                }
+
+                .icon-btn:hover {
+                    background: #cbd5e1;
+                }
+
                 #class-create-form {
-                    margin-top: 24px;
                     display: grid;
-                    gap: 18px;
+                    gap: 14px;
                 }
 
                 .field {
@@ -89,36 +261,17 @@ class ClassCreateContent extends HTMLElement {
                     font-size: 13px;
                 }
 
-                .actions button {
-                    border: none;
-                    background: #2563eb;
-                    color: #ffffff;
-                    padding: 11px 16px;
-                    border-radius: 10px;
-                    font-weight: 700;
-                    cursor: pointer;
-                    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25);
-                }
-
-                .actions button:hover {
-                    background: #1d4ed8;
-                }
-
-                .global-message {
-                    min-height: 18px;
-                    font-weight: 600;
-                }
-
-                .global-message.success {
-                    color: #166534;
-                }
-
-                .global-message.error {
-                    color: #b91c1c;
+                .actions {
+                    display: flex;
+                    justify-content: flex-end;
                 }
             </style>
         `;
 
+        const tableBody = this.querySelector("#classes-table-body");
+        const openModalBtn = this.querySelector("#open-modal-btn");
+        const closeModalBtn = this.querySelector("#close-modal-btn");
+        const modal = this.querySelector("#class-modal");
         const form = this.querySelector("#class-create-form");
         const nomInput = this.querySelector("#nom");
         const roleInput = this.querySelector("#role");
@@ -132,9 +285,12 @@ class ClassCreateContent extends HTMLElement {
             field.classList.toggle("invalid", Boolean(message));
         };
 
-        const clearMessages = () => {
-            messageEl.textContent = "";
+        const showMessage = (message, type = "") => {
+            messageEl.textContent = message;
             messageEl.className = "global-message";
+            if (type) {
+                messageEl.classList.add(type);
+            }
         };
 
         const validateField = (field) => {
@@ -147,19 +303,91 @@ class ClassCreateContent extends HTMLElement {
             return true;
         };
 
+        const openModal = () => {
+            modal.classList.remove("hidden");
+            modal.setAttribute("aria-hidden", "false");
+            nomInput.focus();
+        };
+
+        const closeModal = () => {
+            modal.classList.add("hidden");
+            modal.setAttribute("aria-hidden", "true");
+            form.reset();
+            setFieldError(nomInput, "");
+            setFieldError(roleInput, "");
+        };
+
+        const renderRows = (classes) => {
+            if (!Array.isArray(classes) || classes.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="empty-row">Aucune classe disponible.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = classes
+                .map((classe) => `
+                    <tr>
+                        <td>${classe.id ?? "-"}</td>
+                        <td>${classe.nom ?? "-"}</td>
+                        <td>${classe.role ?? "-"}</td>
+                        <td>
+                            <button class="delete-btn" data-id="${classe.id}">Supprimer</button>
+                        </td>
+                    </tr>
+                `)
+                .join("");
+        };
+
+        const loadClasses = async () => {
+            try {
+                const response = await fetch("/api/classes");
+                if (!response.ok) {
+                    renderRows([]);
+                    showMessage("Impossible de charger les classes.", "error");
+                    return;
+                }
+                const data = await response.json();
+                renderRows(data);
+            } catch (error) {
+                renderRows([]);
+                showMessage("Erreur reseau lors du chargement des classes.", "error");
+            }
+        };
+
+        const deleteClasse = async (id) => {
+            try {
+                const response = await fetch(`/api/classes/${id}`, { method: "DELETE" });
+                if (!response.ok) {
+                    showMessage("Suppression impossible.", "error");
+                    return;
+                }
+                showMessage("Classe supprimee.", "success");
+                await loadClasses();
+            } catch (error) {
+                showMessage("Erreur reseau pendant la suppression.", "error");
+            }
+        };
+
+        openModalBtn.addEventListener("click", openModal);
+        closeModalBtn.addEventListener("click", closeModal);
+        modal.addEventListener("click", (event) => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
         nomInput.addEventListener("input", () => validateField(nomInput));
         roleInput.addEventListener("input", () => validateField(roleInput));
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            clearMessages();
 
             const isNomValid = validateField(nomInput);
             const isRoleValid = validateField(roleInput);
-
             if (!isNomValid || !isRoleValid) {
-                messageEl.textContent = "Veuillez corriger les champs en erreur.";
-                messageEl.classList.add("error");
                 return;
             }
 
@@ -176,21 +404,30 @@ class ClassCreateContent extends HTMLElement {
                 });
 
                 if (!response.ok) {
-                    messageEl.textContent = "La creation a echoue. Verifie les donnees saisies.";
-                    messageEl.classList.add("error");
+                    showMessage("Creation impossible. Verifie les informations.", "error");
                     return;
                 }
 
-                form.reset();
-                setFieldError(nomInput, "");
-                setFieldError(roleInput, "");
-                messageEl.textContent = "Classe creee avec succes.";
-                messageEl.classList.add("success");
+                closeModal();
+                showMessage("Classe creee avec succes.", "success");
+                await loadClasses();
             } catch (error) {
-                messageEl.textContent = "Impossible de joindre le serveur.";
-                messageEl.classList.add("error");
+                showMessage("Erreur reseau pendant la creation.", "error");
             }
         });
+
+        tableBody.addEventListener("click", async (event) => {
+            if (!event.target.matches(".delete-btn")) {
+                return;
+            }
+            const id = event.target.getAttribute("data-id");
+            if (!id) {
+                return;
+            }
+            await deleteClasse(id);
+        });
+
+        loadClasses();
     }
 }
 
