@@ -23,7 +23,7 @@ import java.util.List;
  * Fournit les operations de creation, suppression et gestion du lien player-classe.
  */
 @RestController
-@RequestMapping("/players")
+@RequestMapping("/api/players")
 public class PlayerController {
 
     private final PlayerRepository playerRepository;
