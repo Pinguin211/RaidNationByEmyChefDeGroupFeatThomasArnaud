@@ -16,7 +16,7 @@ public class TestPageController {
      */
     @GetMapping({"/test", "/test/"})
     public String testIndex() {
-        return "forward:/index.html";
+        return "forward:/test/index.html";
     }
 
     /**
@@ -26,7 +26,7 @@ public class TestPageController {
      */
     @GetMapping({"/test/players", "/test/players/"})
     public String testPlayersPage() {
-        return "forward:/players.html";
+        return "forward:/test/players.html";
     }
 
     /**
@@ -36,7 +36,7 @@ public class TestPageController {
      */
     @GetMapping({"/test/classes", "/test/classes/"})
     public String testClassesPage() {
-        return "forward:/classes.html";
+        return "forward:/test/classes.html";
     }
 
     /**
@@ -46,6 +46,6 @@ public class TestPageController {
      */
     @GetMapping({"/test/groupes", "/test/groupes/"})
     public String testGroupesPage() {
-        return "forward:/groupes.html";
+        return "forward:/test/groupes.html";
     }
 }
