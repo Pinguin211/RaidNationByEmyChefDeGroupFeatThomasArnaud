@@ -1,4 +1,4 @@
-package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity;
+package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
