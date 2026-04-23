@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Controller de vue en zone test pour consulter les players.
  */
 @RestController
-@RequestMapping("/api/players")
+@RequestMapping("/test/api/players")
 public class PlayerViewController {
 
     private final PlayerRepository playerRepository;

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * Controller de vue en zone test pour consulter les groupes.
  */
 @RestController
-@RequestMapping("/api/groupes")
+@RequestMapping("/test/api/groupes")
 public class GroupeViewController {
 
     private final GroupeRepository groupeRepository;

@@ -10,9 +10,9 @@
 <header>
     <h1>Test API - Classes</h1>
     <nav>
-        <a href="/players.html">Players</a>
-        <a href="/classes.html">Classes</a>
-        <a href="/groupes.html">Groupes</a>
+        <a href="/test/players">Players</a>
+        <a href="/test/classes">Classes</a>
+        <a href="/test/groupes">Groupes</a>
     </nav>
 </header>
 
@@ -41,7 +41,8 @@
 </main>
 
 <script>
-    const apiBase = "/api/classes";
+    const viewApiBase = "/test/api/classes";
+    const writeApiBase = "/api/classes";
     const statusEl = document.getElementById("status");
     const listEl = document.getElementById("list");
     const formEl = document.getElementById("create-form");
@@ -53,7 +54,7 @@
 
     async function fetchClasses() {
         listEl.innerHTML = "";
-        const response = await fetch(apiBase);
+        const response = await fetch(viewApiBase);
         if (!response.ok) {
             setStatus("Impossible de charger les classes.", false);
             return;
@@ -87,7 +88,7 @@
             role: formEl.role.value
         };
 
-        const response = await fetch(apiBase, {
+        const response = await fetch(writeApiBase, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -109,7 +110,7 @@
         }
 
         const id = event.target.getAttribute("data-id");
-        const response = await fetch(`${apiBase}/${id}`, { method: "DELETE" });
+        const response = await fetch(`${writeApiBase}/${id}`, { method: "DELETE" });
         if (!response.ok) {
             setStatus("Suppression echouee.", false);
             return;
