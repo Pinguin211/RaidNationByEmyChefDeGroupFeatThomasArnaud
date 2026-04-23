@@ -3,6 +3,7 @@ package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller.ClasseViewController;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller.GroupeViewController;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller.PlayerViewController;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller.TestPageController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
@@ -23,7 +24,8 @@ public class TestApplication {
     @Import({
             PlayerViewController.class,
             ClasseViewController.class,
-            GroupeViewController.class
+            GroupeViewController.class,
+            TestPageController.class
     })
     static class TestConfig {
         // Ajouter ici des beans/configs specifiques test si necessaire.

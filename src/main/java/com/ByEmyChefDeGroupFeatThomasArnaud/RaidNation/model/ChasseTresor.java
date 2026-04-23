@@ -1,49 +1,31 @@
 package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 
 @Entity
-public class ChasseTresor extends Activite{
+public class ChasseTresor extends Activite { // Hérite de l'ID d'Activite
 	
-	@Id
-	@GeneratedValue
-	private Long id;
-	private int nbCartes;
-	private String type;
+    // nbCartes est un champ simple, pas un ID !
+    private int nbCartes; 
+    private String type;
 	
-	public ChasseTresor() {
-		super();
-	}
+    public ChasseTresor() {
+        super();
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public int getNbCartes() {
+        return nbCartes;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setNbCartes(int nbCartes) {
+        this.nbCartes = nbCartes;
+    }
 
-	public int getNbCartes() {
-		return nbCartes;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setNbCartes(int nbCartes) {
-		this.nbCartes = nbCartes;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-	
-	
-	
-	
-	
-
+    public void setType(String type) {
+        this.type = type;
+    }
 }

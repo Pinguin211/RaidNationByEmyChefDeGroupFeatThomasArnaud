@@ -1,5 +1,6 @@
-package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity;
+package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,27 +13,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entite representant une classe de personnage.
+ * Entite representant un groupe de joueurs.
  */
 @Entity
-@Table(name = "classe")
-public class Classe {
+@Table(name = "groupe")
+public class Groupe {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(nullable = false)
-    private String role;
-
-    @Column(nullable = false)
     private String nom;
 
-    @ManyToMany(mappedBy = "classes")
+    @ManyToMany(mappedBy = "groupes")
+    @JsonIgnoreProperties({"groupes", "classes"})
     private Set<Player> players = new HashSet<>();
 
     /** Constructeur par defaut requis par JPA. */
-    public Classe() {
+    public Groupe() {
     }
 
     public Integer getId() {
@@ -41,14 +40,6 @@ public class Classe {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public String getNom() {

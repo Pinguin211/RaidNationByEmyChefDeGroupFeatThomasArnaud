@@ -14,7 +14,7 @@ Vue d'ensemble de l'organisation actuelle.
 
 ## Packages Java principaux
 
-- `entity/` : entites JPA (`Player`, `Classe`, `Groupe`)
+- `model/` : modeles JPA (`Player`, `Classe`, `Groupe`)
 - `repository/` : repositories Spring Data JPA
 - `controller/` : controllers API principaux (creation/suppression/associations)
 

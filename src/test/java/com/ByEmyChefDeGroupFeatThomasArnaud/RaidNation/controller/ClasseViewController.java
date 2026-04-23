@@ -1,6 +1,6 @@
 package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller;
 
-import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity.Player;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Player;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.ClasseRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * Controller de vue en zone test pour consulter les classes.
  */
 @RestController
-@RequestMapping("/api/classes")
+@RequestMapping("/test/api/classes")
 public class ClasseViewController {
 
     private final ClasseRepository classeRepository;

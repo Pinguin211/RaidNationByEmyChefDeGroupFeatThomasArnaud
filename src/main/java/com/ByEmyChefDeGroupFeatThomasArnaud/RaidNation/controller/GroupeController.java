@@ -1,27 +1,23 @@
 package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller;
 
-import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity.Groupe;
-import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity.Player;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Groupe;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Player;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.GroupeRepository;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.PlayerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List; // Ton import nécessaire pour getAllGroupes()
 
 /**
  * API principale pour la gestion des groupes.
  * Fournit les operations de creation, suppression et gestion du lien groupe-player.
  */
 @RestController
-@RequestMapping("/api/groupes")
+@RequestMapping("/groupes")
 public class GroupeController {
 
     private final GroupeRepository groupeRepository;
@@ -123,5 +119,20 @@ public class GroupeController {
     }
 
     public record CreateGroupeRequest(String nom) {
+    }
+    
+    @GetMapping
+    public ResponseEntity<List<Groupe>> getAllGroupes() {
+        return ResponseEntity.ok(groupeRepository.findAll());
+    }
+
+    /**
+     * Récupère un groupe spécifique par son ID.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Groupe> getGroupeById(@PathVariable Integer id) {
+        return groupeRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

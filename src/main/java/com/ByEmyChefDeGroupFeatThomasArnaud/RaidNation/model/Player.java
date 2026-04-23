@@ -1,6 +1,7 @@
-package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity;
+package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model;
 
 import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,6 +35,7 @@ public class Player {
             joinColumns = @JoinColumn(name = "player_id"),
             inverseJoinColumns = @JoinColumn(name = "classe_id")
     )
+    @JsonIgnoreProperties("players")
     private Set<Classe> classes = new HashSet<>();
 
     @ManyToMany
@@ -42,6 +44,7 @@ public class Player {
             joinColumns = @JoinColumn(name = "player_id"),
             inverseJoinColumns = @JoinColumn(name = "groupe_id")
     )
+    @JsonIgnoreProperties("players")
     private Set<Groupe> groupes = new HashSet<>();
 
     /** Constructeur par defaut requis par JPA. */

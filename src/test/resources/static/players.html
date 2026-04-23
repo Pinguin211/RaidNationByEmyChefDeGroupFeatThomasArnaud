@@ -10,9 +10,9 @@
 <header>
     <h1>Test API - Players</h1>
     <nav>
-        <a href="/players.html">Players</a>
-        <a href="/classes.html">Classes</a>
-        <a href="/groupes.html">Groupes</a>
+        <a href="/test/players">Players</a>
+        <a href="/test/classes">Classes</a>
+        <a href="/test/groupes">Groupes</a>
     </nav>
 </header>
 
@@ -57,7 +57,8 @@
 </main>
 
 <script>
-    const apiBase = "/api/players";
+    const viewApiBase = "/test/api/players";
+    const writeApiBase = "/api/players";
     const statusEl = document.getElementById("status");
     const listEl = document.getElementById("list");
     const createFormEl = document.getElementById("create-form");
@@ -71,7 +72,7 @@
 
     async function fetchPlayers() {
         listEl.innerHTML = "";
-        const response = await fetch(apiBase);
+        const response = await fetch(viewApiBase);
         if (!response.ok) {
             setStatus("Impossible de charger les players.", false);
             return;
@@ -101,7 +102,7 @@
     createFormEl.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        const response = await fetch(apiBase, {
+        const response = await fetch(writeApiBase, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nom: createFormEl.nom.value })
@@ -122,7 +123,7 @@
         const playerId = linkFormEl.playerId.value;
         const classeId = linkFormEl.classeId.value;
 
-        const response = await fetch(`${apiBase}/${playerId}/classes/${classeId}`, { method: "POST" });
+        const response = await fetch(`${writeApiBase}/${playerId}/classes/${classeId}`, { method: "POST" });
         if (!response.ok) {
             setStatus("Association player-classe echouee.", false);
             return;
@@ -138,7 +139,7 @@
         const playerId = unlinkFormEl.unlinkPlayerId.value;
         const classeId = unlinkFormEl.unlinkClasseId.value;
 
-        const response = await fetch(`${apiBase}/${playerId}/classes/${classeId}`, { method: "DELETE" });
+        const response = await fetch(`${writeApiBase}/${playerId}/classes/${classeId}`, { method: "DELETE" });
         if (!response.ok) {
             setStatus("Suppression association echouee.", false);
             return;
@@ -155,7 +156,7 @@
         }
 
         const id = event.target.getAttribute("data-id");
-        const response = await fetch(`${apiBase}/${id}`, { method: "DELETE" });
+        const response = await fetch(`${writeApiBase}/${id}`, { method: "DELETE" });
         if (!response.ok) {
             setStatus("Suppression echouee.", false);
             return;
