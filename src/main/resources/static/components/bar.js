@@ -2,6 +2,7 @@ class AppBar extends HTMLElement {
     connectedCallback() {
         const currentPath = window.location.pathname;
         const isHome = currentPath === "/" || currentPath === "/index.html";
+        const isPlayers = currentPath === "/players" || currentPath === "/players.html";
         const isClasses = currentPath === "/classes" || currentPath === "/classes.html";
 
         this.innerHTML = `
@@ -9,7 +10,8 @@ class AppBar extends HTMLElement {
                 <h2>RaidNation</h2>
                 <nav>
                     <a href="/" ${isHome ? "aria-current='page'" : ""}>Page principale</a>
-                    <a href="/classes" ${isClasses ? "aria-current='page'" : ""}>Ajouter une classe</a>
+                    <a href="/players" ${isPlayers ? "aria-current='page'" : ""}>Players</a>
+                    <a href="/classes" ${isClasses ? "aria-current='page'" : ""}>Classes</a>
                 </nav>
             </aside>
         `;

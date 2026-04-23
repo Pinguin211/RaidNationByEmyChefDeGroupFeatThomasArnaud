@@ -11,13 +11,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import org.springframework.web.bind.annotation.GetMapping;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 /**
  * API principale pour la gestion des players.
  * Fournit les operations de creation, suppression et gestion du lien player-classe.
@@ -50,6 +53,46 @@ public class PlayerController {
         player.setNom(request.nom().trim());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(playerRepository.save(player));
+    }
+
+    /**
+     * Modifie un player (nom + classes associees).
+     *
+     * @param id identifiant du player
+     * @param request payload contenant le nom et les ids de classes
+     * @return le player mis a jour, 400 si invalide, 404 si absent
+     */
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Player> updatePlayer(@PathVariable Integer id, @RequestBody UpdatePlayerRequest request) {
+        if (request.nom() == null || request.nom().isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Player player = playerRepository.findById(id).orElse(null);
+        if (player == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        player.setNom(request.nom().trim());
+
+        ArrayList<Classe> oldClasses = new ArrayList<>(player.getClasses());
+        for (Classe oldClasse : oldClasses) {
+            oldClasse.getPlayers().remove(player);
+        }
+        player.getClasses().clear();
+
+        Set<Classe> newClasses = new HashSet<>();
+        if (request.classeIds() != null && !request.classeIds().isEmpty()) {
+            newClasses.addAll(classeRepository.findAllById(request.classeIds()));
+        }
+
+        for (Classe classe : newClasses) {
+            classe.getPlayers().add(player);
+        }
+        player.getClasses().addAll(newClasses);
+
+        return ResponseEntity.ok(playerRepository.save(player));
     }
 
     /**
@@ -133,6 +176,9 @@ public class PlayerController {
     }
 
     public record CreatePlayerRequest(String nom) {
+    }
+
+    public record UpdatePlayerRequest(String nom, List<Integer> classeIds) {
     }
     
     @GetMapping
