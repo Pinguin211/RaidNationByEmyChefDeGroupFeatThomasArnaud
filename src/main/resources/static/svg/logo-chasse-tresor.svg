@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">Logo Chasse au Tresor</title>
+  <desc id="desc">Un coffre au tresor avec une boussole en arriere-plan.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="240" height="240" rx="44" fill="url(#bg)"/>
+
+  <circle cx="128" cy="90" r="42" fill="none" stroke="#93c5fd" stroke-width="10" opacity="0.85"/>
+  <path d="M128 52 L136 82 L166 90 L136 98 L128 128 L120 98 L90 90 L120 82 Z" fill="#bfdbfe" opacity="0.9"/>
+
+  <rect x="58" y="118" width="140" height="86" rx="14" fill="#78350f"/>
+  <rect x="58" y="118" width="140" height="24" rx="12" fill="#92400e"/>
+  <rect x="58" y="150" width="140" height="54" rx="10" fill="#7c2d12"/>
+
+  <rect x="58" y="136" width="140" height="10" fill="url(#gold)"/>
+  <rect x="120" y="118" width="16" height="86" fill="url(#gold)"/>
+  <rect x="112" y="154" width="32" height="28" rx="7" fill="#fcd34d" stroke="#78350f" stroke-width="4"/>
+  <circle cx="128" cy="168" r="5" fill="#78350f"/>
+
+  <circle cx="84" cy="114" r="8" fill="#fde68a"/>
+  <circle cx="172" cy="110" r="7" fill="#fbbf24"/>
+</svg>
