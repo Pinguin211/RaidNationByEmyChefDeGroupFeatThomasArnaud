@@ -7,3 +7,4 @@ import "/components/class-create-content.js";
 import "/components/group-create-content.js";
 import "/components/player-manage-content.js";
 import "/components/raid-create-content.js";
+import "/components/chasse-create-content.js";

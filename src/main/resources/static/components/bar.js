@@ -6,6 +6,7 @@ class AppBar extends HTMLElement {
         const isClasses = currentPath === "/classes" || currentPath === "/classes.html";
         const isGroupes = currentPath === "/groupes" || currentPath === "/groupes.html";
 		const isRaids = currentPath === "/raids" || currentPath === "/raids.html";
+		const isChasses = currentPath === "/chasses" || currentPath === "/chasses.html";
 
         this.innerHTML = `
             <aside class="app-bar">
@@ -16,6 +17,7 @@ class AppBar extends HTMLElement {
                     <a href="/classes" ${isClasses ? "aria-current='page'" : ""}>Classes</a>
                     <a href="/groupes" ${isGroupes ? "aria-current='page'" : ""}>Groupes</a>
 					<a href="/raids" ${isRaids ? "aria-current='page'" : ""}>Raids</a>
+					<a href="/chasses" ${isChasses ? "aria-current='page'" : ""}>Chasses</a>
                 </nav>
             </aside>
         `;
