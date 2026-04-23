@@ -1,4 +1,3 @@
-
 BEGIN;
 
 -- ==========================================
@@ -499,4 +498,95 @@ VALUES ((SELECT id FROM player WHERE nom = 'Hildibrand Manderville'),
        ((SELECT id FROM player WHERE nom = 'Julyan Manderville'),
         (SELECT id FROM groupe WHERE nom = 'Roster Détente et Wipes'));
 
+-- Insertion des 10 Raids (dtype = 'Raid')
+INSERT INTO activite (dtype, horaire, nom, difficulte, type, is_farm_session, nb_cartes)
+VALUES ('Raid', CURRENT_DATE + INTERVAL '1 day 21:00:00', 'L''Abîme infini de Bahamut (UCOB)', 'Fatal', 'Raid 8', false,
+        NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '2 days 20:30:00', 'La Fantasmagorie de l''Ultima Arma (UWU)', 'Fatal',
+        'Raid 8', true, NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '5 days 21:00:00', 'Le Purgatoire du Pandæmonium - Abîme', 'Sadique', 'Raid 8',
+        true, NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '7 days 21:15:00', 'L''Arcadion - Section Mi-Lourds (M4S)', 'Sadique', 'Raid 8',
+        false, NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '9 days 15:00:00', 'Mythe éorzéen - Euphrosyne', 'Normal',
+        'Raid en alliance 24', true, NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '12 days 20:45:00', 'L''Odyssée d''Alexander (TEA)', 'Fatal', 'Raid 8', false,
+        NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '15 days 21:00:00', 'La Guerre du chant des dragons (DSR)', 'Fatal', 'Raid 8',
+        false, NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '19 days 21:30:00', 'Oméga - Alphastice (O12S)', 'Sadique', 'Raid 8', true,
+        NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '22 days 14:00:00', 'Mythe éorzéen - Aglaé', 'Normal', 'Raid en alliance 24',
+        false, NULL),
+       ('Raid', CURRENT_DATE + INTERVAL '29 days 20:30:00', 'Le Protocole Oméga (TOP)', 'Fatal', 'Raid 8', true, NULL);
+
+-- Insertion des 5 Chasses au Trésor (dtype = 'ChasseTresor')
+INSERT INTO activite (dtype, horaire, nom, difficulte, type, is_farm_session, nb_cartes)
+VALUES ('ChasseTresor', CURRENT_DATE + INTERVAL '3 days 14:00:00', NULL, NULL,
+        'Carte au trésor en peau de Kumbhir (Niv 90)', NULL, 10),
+       ('ChasseTresor', CURRENT_DATE + INTERVAL '8 days 15:30:00', NULL, NULL,
+        'Carte au trésor en peau d''Ophiotauros (Niv 90)', NULL, 15),
+       ('ChasseTresor', CURRENT_DATE + INTERVAL '16 days 20:00:00', NULL, NULL,
+        'Carte au trésor en peau de Br''aax (Niv 100)', NULL, 8),
+       ('ChasseTresor', CURRENT_DATE + INTERVAL '23 days 16:00:00', NULL, NULL,
+        'Carte au trésor en peau de Gazelle (Niv 70)', NULL, 12),
+       ('ChasseTresor', CURRENT_DATE + INTERVAL '27 days 21:00:00', NULL, NULL,
+        'Carte au trésor en peau de Glaucus (Niv 100)', NULL, 20);
+
+-- ==========================================
+-- ETAPE 7 : ASSOCIATION DES GROUPES AUX ACTIVITES
+-- ==========================================
+
+-- Associations pour les Raids Fatals (Statics dédiées)
+INSERT INTO groupe_activite (groupe_id, activite_id)
+VALUES ((SELECT id FROM groupe WHERE nom = 'Static UCOB (Fatal)'),
+        (SELECT id FROM activite WHERE nom = 'L''Abîme infini de Bahamut (UCOB)')),
+       ((SELECT id FROM groupe WHERE nom = 'Static UWU (Fatal)'),
+        (SELECT id FROM activite WHERE nom = 'La Fantasmagorie de l''Ultima Arma (UWU)')),
+       ((SELECT id FROM groupe WHERE nom = 'Static TEA (Fatal)'),
+        (SELECT id FROM activite WHERE nom = 'L''Odyssée d''Alexander (TEA)')),
+       ((SELECT id FROM groupe WHERE nom = 'Static DSR (Fatal)'),
+        (SELECT id FROM activite WHERE nom = 'La Guerre du chant des dragons (DSR)')),
+       ((SELECT id FROM groupe WHERE nom = 'Static TOP (Fatal)'),
+        (SELECT id FROM activite WHERE nom = 'Le Protocole Oméga (TOP)')),
+       ((SELECT id FROM groupe WHERE nom = 'Speedkill Asphodelos'),
+        (SELECT id FROM activite WHERE nom = 'Le Protocole Oméga (TOP)'));
+
+-- Associations pour les Raids Sadiques et Farm (CORRIGÉ ICI)
+INSERT INTO groupe_activite (groupe_id, activite_id)
+VALUES ((SELECT id FROM groupe WHERE nom = 'Progression M1S-M4S'),
+        (SELECT id FROM activite WHERE nom = 'L''Arcadion - Section Mi-Lourds (M4S)')),
+       ((SELECT id FROM groupe WHERE nom = 'Farm Pandaemonium'),
+        (SELECT id FROM activite WHERE nom = 'Le Purgatoire du Pandæmonium - Abîme')),
+       ((SELECT id FROM groupe WHERE nom = 'Roster Lalafell'),
+        (SELECT id FROM activite WHERE nom = 'Oméga - Alphastice (O12S)')), -- <--- Remplacé ici !
+       ((SELECT id FROM groupe WHERE nom = 'Farm Montures Extremes'),
+        (SELECT id FROM activite WHERE nom = 'Oméga - Alphastice (O12S)')),
+       ((SELECT id FROM groupe WHERE nom = 'Roster Blind Arcadion'),
+        (SELECT id FROM activite WHERE nom = 'L''Arcadion - Section Mi-Lourds (M4S)')),
+       ((SELECT id FROM groupe WHERE nom = 'Static Midcore Soirée'),
+        (SELECT id FROM activite WHERE nom = 'Le Purgatoire du Pandæmonium - Abîme'));
+
+-- Associations pour les Raids en Alliance (Groupes larges)
+INSERT INTO groupe_activite (groupe_id, activite_id)
+VALUES ((SELECT id FROM groupe WHERE nom = 'Alliance 24 - Euphrosyne'),
+        (SELECT id FROM activite WHERE nom = 'Mythe éorzéen - Euphrosyne')),
+       ((SELECT id FROM groupe WHERE nom = 'Alliance 24 - Euphrosyne'),
+        (SELECT id FROM activite WHERE nom = 'Mythe éorzéen - Aglaé')),
+       ((SELECT id FROM groupe WHERE nom = 'CL Gardiens d Eorzea'),
+        (SELECT id FROM activite WHERE nom = 'Mythe éorzéen - Euphrosyne'));
+
+-- Associations pour les Chasses au Trésor (Compagnies Libres et Groupes Détente)
+INSERT INTO groupe_activite (groupe_id, activite_id)
+VALUES ((SELECT id FROM groupe WHERE nom = 'CL Les Chocobos Fringants'),
+        (SELECT id FROM activite WHERE type LIKE '%Kumbhir%')),
+       ((SELECT id FROM groupe WHERE nom = 'CL Les Chocobos Fringants'),
+        (SELECT id FROM activite WHERE type LIKE '%Ophiotauros%')),
+       ((SELECT id FROM groupe WHERE nom = 'CL Gardiens d Eorzea'),
+        (SELECT id FROM activite WHERE type LIKE '%Br''aax%')),
+       ((SELECT id FROM groupe WHERE nom = 'Roster Détente et Wipes'),
+        (SELECT id FROM activite WHERE type LIKE '%Gazelle%')),
+       ((SELECT id FROM groupe WHERE nom = 'Roster Matinal'), (SELECT id FROM activite WHERE type LIKE '%Glaucus%')),
+       ((SELECT id FROM groupe WHERE nom = 'Static Nuit Blanche'),
+        (SELECT id FROM activite WHERE type LIKE '%Glaucus%'));
 COMMIT;
