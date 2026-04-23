@@ -4,6 +4,7 @@ class IndexContent extends HTMLElement {
             <section class="index-content">
                 <h1>Page principale</h1>
                 <p>Bienvenue sur la page principale construite avec le layout de base.</p>
+                <upcoming-calendar></upcoming-calendar>
             </section>
             <style>
                 .index-content {

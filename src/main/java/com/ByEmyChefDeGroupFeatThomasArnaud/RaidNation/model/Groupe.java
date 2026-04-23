@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.JoinColumn;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +31,15 @@ public class Groupe {
     @ManyToMany(mappedBy = "groupes")
     @JsonIgnoreProperties({"groupes", "classes"})
     private Set<Player> players = new HashSet<>();
+    
+    @ManyToMany
+    @JoinTable(
+            name = "groupe_activite",
+            joinColumns = @JoinColumn(name = "groupe_id"),
+            inverseJoinColumns = @JoinColumn(name = "activite_id")
+    )
+    @JsonIgnoreProperties({"groupes", "players"})
+    private Set<Activite> activites = new HashSet<>();
 
     /** Constructeur par defaut requis par JPA. */
     public Groupe() {
@@ -56,5 +67,13 @@ public class Groupe {
 
     public void setPlayers(Set<Player> players) {
         this.players = players;
+    }
+    
+    public Set<Activite> getActivites() {
+        return activites;
+    }
+
+    public void setActivites(Set<Activite> activites) {
+        this.activites = activites;
     }
 }
