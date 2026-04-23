@@ -49,4 +49,14 @@ public class MainPageController {
     public String playersPage() {
         return "forward:/players.html";
     }
+    
+    /**
+     * Affiche la page principale de gestion des players.
+     *
+     * @return forward vers la page players
+     */
+    @GetMapping({"/raids", "/raids/"})
+    public String raidsPage() {
+        return "forward:/raids.html";
+    }
 }
