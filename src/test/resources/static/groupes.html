@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Groupes</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+    <h1>Test API - Groupes</h1>
+    <nav>
+        <a href="/players.html">Players</a>
+        <a href="/classes.html">Classes</a>
+        <a href="/groupes.html">Groupes</a>
+    </nav>
+</header>
+
+<main>
+    <section class="left-panel">
+        <h2>Ajouter un groupe</h2>
+        <p class="helper">Creation et gestion groupe-player.</p>
+        <div id="status" class="status"></div>
+
+        <form id="create-form">
+            <label for="nom">Nom</label>
+            <input id="nom" name="nom" required>
+            <button type="submit">Creer le groupe</button>
+        </form>
+
+        <form id="link-form">
+            <label for="groupeId">Groupe ID</label>
+            <input id="groupeId" name="groupeId" type="number" required>
+
+            <label for="playerId">Player ID</label>
+            <input id="playerId" name="playerId" type="number" required>
+
+            <button type="submit">Ajouter le player au groupe</button>
+        </form>
+
+        <form id="unlink-form">
+            <label for="unlinkGroupeId">Groupe ID</label>
+            <input id="unlinkGroupeId" name="unlinkGroupeId" type="number" required>
+
+            <label for="unlinkPlayerId">Player ID</label>
+            <input id="unlinkPlayerId" name="unlinkPlayerId" type="number" required>
+
+            <button type="submit">Retirer le player du groupe</button>
+        </form>
+    </section>
+
+    <section class="right-panel">
+        <h2>Liste des groupes</h2>
+        <p class="helper">Suppression disponible sur chaque ligne.</p>
+        <div id="list" class="entity-list"></div>
+    </section>
+</main>
+
+<script>
+    const apiBase = "/api/groupes";
+    const statusEl = document.getElementById("status");
+    const listEl = document.getElementById("list");
+    const createFormEl = document.getElementById("create-form");
+    const linkFormEl = document.getElementById("link-form");
+    const unlinkFormEl = document.getElementById("unlink-form");
+
+    function setStatus(message, ok = true) {
+        statusEl.textContent = message;
+        statusEl.className = "status " + (ok ? "ok" : "err");
+    }
+
+    async function fetchGroupes() {
+        listEl.innerHTML = "";
+        const response = await fetch(apiBase);
+        if (!response.ok) {
+            setStatus("Impossible de charger les groupes.", false);
+            return;
+        }
+
+        const groupes = await response.json();
+        if (groupes.length === 0) {
+            listEl.innerHTML = "<div class='entity-item'>Aucun groupe.</div>";
+            return;
+        }
+
+        groupes.forEach(groupe => {
+            const item = document.createElement("div");
+            item.className = "entity-item";
+            item.innerHTML = `
+                <div class="entity-meta">
+                    <strong>#${groupe.id} - ${groupe.nom}</strong>
+                    <span>Players: ${groupe.playerIds.join(", ") || "-"}</span>
+                </div>
+                <button class="delete-btn" data-id="${groupe.id}">Supprimer</button>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+
+    createFormEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const response = await fetch(apiBase, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nom: createFormEl.nom.value })
+        });
+
+        if (!response.ok) {
+            setStatus("Creation echouee.", false);
+            return;
+        }
+
+        createFormEl.reset();
+        setStatus("Groupe cree.");
+        await fetchGroupes();
+    });
+
+    linkFormEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const groupeId = linkFormEl.groupeId.value;
+        const playerId = linkFormEl.playerId.value;
+
+        const response = await fetch(`${apiBase}/${groupeId}/players/${playerId}`, { method: "POST" });
+        if (!response.ok) {
+            setStatus("Association groupe-player echouee.", false);
+            return;
+        }
+
+        linkFormEl.reset();
+        setStatus("Player ajoute au groupe.");
+        await fetchGroupes();
+    });
+
+    unlinkFormEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const groupeId = unlinkFormEl.unlinkGroupeId.value;
+        const playerId = unlinkFormEl.unlinkPlayerId.value;
+
+        const response = await fetch(`${apiBase}/${groupeId}/players/${playerId}`, { method: "DELETE" });
+        if (!response.ok) {
+            setStatus("Suppression association echouee.", false);
+            return;
+        }
+
+        unlinkFormEl.reset();
+        setStatus("Player retire du groupe.");
+        await fetchGroupes();
+    });
+
+    listEl.addEventListener("click", async (event) => {
+        if (!event.target.matches(".delete-btn")) {
+            return;
+        }
+
+        const id = event.target.getAttribute("data-id");
+        const response = await fetch(`${apiBase}/${id}`, { method: "DELETE" });
+        if (!response.ok) {
+            setStatus("Suppression echouee.", false);
+            return;
+        }
+
+        setStatus("Groupe supprime.");
+        await fetchGroupes();
+    });
+
+    fetchGroupes();
+</script>
+</body>
+</html>

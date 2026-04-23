@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Classes</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+    <h1>Test API - Classes</h1>
+    <nav>
+        <a href="/players.html">Players</a>
+        <a href="/classes.html">Classes</a>
+        <a href="/groupes.html">Groupes</a>
+    </nav>
+</header>
+
+<main>
+    <section class="left-panel">
+        <h2>Ajouter une classe</h2>
+        <p class="helper">Formulaire de creation simple.</p>
+        <div id="status" class="status"></div>
+
+        <form id="create-form">
+            <label for="nom">Nom</label>
+            <input id="nom" name="nom" required>
+
+            <label for="role">Role</label>
+            <input id="role" name="role" required>
+
+            <button type="submit">Creer la classe</button>
+        </form>
+    </section>
+
+    <section class="right-panel">
+        <h2>Liste des classes</h2>
+        <p class="helper">Suppression disponible sur chaque ligne.</p>
+        <div id="list" class="entity-list"></div>
+    </section>
+</main>
+
+<script>
+    const apiBase = "/api/classes";
+    const statusEl = document.getElementById("status");
+    const listEl = document.getElementById("list");
+    const formEl = document.getElementById("create-form");
+
+    function setStatus(message, ok = true) {
+        statusEl.textContent = message;
+        statusEl.className = "status " + (ok ? "ok" : "err");
+    }
+
+    async function fetchClasses() {
+        listEl.innerHTML = "";
+        const response = await fetch(apiBase);
+        if (!response.ok) {
+            setStatus("Impossible de charger les classes.", false);
+            return;
+        }
+
+        const classes = await response.json();
+        if (classes.length === 0) {
+            listEl.innerHTML = "<div class='entity-item'>Aucune classe.</div>";
+            return;
+        }
+
+        classes.forEach(classe => {
+            const item = document.createElement("div");
+            item.className = "entity-item";
+            item.innerHTML = `
+                <div class="entity-meta">
+                    <strong>#${classe.id} - ${classe.nom}</strong>
+                    <span>Role: ${classe.role}</span>
+                    <span>Players lies: ${classe.playerIds.length}</span>
+                </div>
+                <button class="delete-btn" data-id="${classe.id}">Supprimer</button>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+
+    formEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const payload = {
+            nom: formEl.nom.value,
+            role: formEl.role.value
+        };
+
+        const response = await fetch(apiBase, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            setStatus("Creation echouee.", false);
+            return;
+        }
+
+        formEl.reset();
+        setStatus("Classe creee.");
+        await fetchClasses();
+    });
+
+    listEl.addEventListener("click", async (event) => {
+        if (!event.target.matches(".delete-btn")) {
+            return;
+        }
+
+        const id = event.target.getAttribute("data-id");
+        const response = await fetch(`${apiBase}/${id}`, { method: "DELETE" });
+        if (!response.ok) {
+            setStatus("Suppression echouee.", false);
+            return;
+        }
+
+        setStatus("Classe supprimee.");
+        await fetchClasses();
+    });
+
+    fetchClasses();
+</script>
+</body>
+</html>

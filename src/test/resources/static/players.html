@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Players</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header>
+    <h1>Test API - Players</h1>
+    <nav>
+        <a href="/players.html">Players</a>
+        <a href="/classes.html">Classes</a>
+        <a href="/groupes.html">Groupes</a>
+    </nav>
+</header>
+
+<main>
+    <section class="left-panel">
+        <h2>Ajouter un player</h2>
+        <p class="helper">Creation et gestion player-classe.</p>
+        <div id="status" class="status"></div>
+
+        <form id="create-form">
+            <label for="nom">Nom</label>
+            <input id="nom" name="nom" required>
+            <button type="submit">Creer le player</button>
+        </form>
+
+        <form id="link-form">
+            <label for="playerId">Player ID</label>
+            <input id="playerId" name="playerId" type="number" required>
+
+            <label for="classeId">Classe ID</label>
+            <input id="classeId" name="classeId" type="number" required>
+
+            <button type="submit">Ajouter la classe au player</button>
+        </form>
+
+        <form id="unlink-form">
+            <label for="unlinkPlayerId">Player ID</label>
+            <input id="unlinkPlayerId" name="unlinkPlayerId" type="number" required>
+
+            <label for="unlinkClasseId">Classe ID</label>
+            <input id="unlinkClasseId" name="unlinkClasseId" type="number" required>
+
+            <button type="submit">Retirer la classe du player</button>
+        </form>
+    </section>
+
+    <section class="right-panel">
+        <h2>Liste des players</h2>
+        <p class="helper">Suppression disponible sur chaque ligne.</p>
+        <div id="list" class="entity-list"></div>
+    </section>
+</main>
+
+<script>
+    const apiBase = "/api/players";
+    const statusEl = document.getElementById("status");
+    const listEl = document.getElementById("list");
+    const createFormEl = document.getElementById("create-form");
+    const linkFormEl = document.getElementById("link-form");
+    const unlinkFormEl = document.getElementById("unlink-form");
+
+    function setStatus(message, ok = true) {
+        statusEl.textContent = message;
+        statusEl.className = "status " + (ok ? "ok" : "err");
+    }
+
+    async function fetchPlayers() {
+        listEl.innerHTML = "";
+        const response = await fetch(apiBase);
+        if (!response.ok) {
+            setStatus("Impossible de charger les players.", false);
+            return;
+        }
+
+        const players = await response.json();
+        if (players.length === 0) {
+            listEl.innerHTML = "<div class='entity-item'>Aucun player.</div>";
+            return;
+        }
+
+        players.forEach(player => {
+            const item = document.createElement("div");
+            item.className = "entity-item";
+            item.innerHTML = `
+                <div class="entity-meta">
+                    <strong>#${player.id} - ${player.nom}</strong>
+                    <span>Classes: ${player.classeIds.join(", ") || "-"}</span>
+                    <span>Groupes: ${player.groupeIds.join(", ") || "-"}</span>
+                </div>
+                <button class="delete-btn" data-id="${player.id}">Supprimer</button>
+            `;
+            listEl.appendChild(item);
+        });
+    }
+
+    createFormEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const response = await fetch(apiBase, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nom: createFormEl.nom.value })
+        });
+
+        if (!response.ok) {
+            setStatus("Creation echouee.", false);
+            return;
+        }
+
+        createFormEl.reset();
+        setStatus("Player cree.");
+        await fetchPlayers();
+    });
+
+    linkFormEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const playerId = linkFormEl.playerId.value;
+        const classeId = linkFormEl.classeId.value;
+
+        const response = await fetch(`${apiBase}/${playerId}/classes/${classeId}`, { method: "POST" });
+        if (!response.ok) {
+            setStatus("Association player-classe echouee.", false);
+            return;
+        }
+
+        linkFormEl.reset();
+        setStatus("Classe ajoutee au player.");
+        await fetchPlayers();
+    });
+
+    unlinkFormEl.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const playerId = unlinkFormEl.unlinkPlayerId.value;
+        const classeId = unlinkFormEl.unlinkClasseId.value;
+
+        const response = await fetch(`${apiBase}/${playerId}/classes/${classeId}`, { method: "DELETE" });
+        if (!response.ok) {
+            setStatus("Suppression association echouee.", false);
+            return;
+        }
+
+        unlinkFormEl.reset();
+        setStatus("Classe retiree du player.");
+        await fetchPlayers();
+    });
+
+    listEl.addEventListener("click", async (event) => {
+        if (!event.target.matches(".delete-btn")) {
+            return;
+        }
+
+        const id = event.target.getAttribute("data-id");
+        const response = await fetch(`${apiBase}/${id}`, { method: "DELETE" });
+        if (!response.ok) {
+            setStatus("Suppression echouee.", false);
+            return;
+        }
+
+        setStatus("Player supprime.");
+        await fetchPlayers();
+    });
+
+    fetchPlayers();
+</script>
+</body>
+</html>
