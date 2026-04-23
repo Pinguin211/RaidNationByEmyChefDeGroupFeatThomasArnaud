@@ -1,5 +1,6 @@
 package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +27,7 @@ public class Groupe {
     private String nom;
 
     @ManyToMany(mappedBy = "groupes")
+    @JsonIgnoreProperties({"groupes", "classes"})
     private Set<Player> players = new HashSet<>();
 
     /** Constructeur par defaut requis par JPA. */

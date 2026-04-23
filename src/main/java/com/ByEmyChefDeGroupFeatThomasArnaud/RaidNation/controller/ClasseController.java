@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
 /**
  * API principale pour la gestion des classes.
  * Fournit les operations de creation et suppression.
  */
 @RestController
-@RequestMapping("/api/classes")
+@RequestMapping("/classes")
 public class ClasseController {
 
     private final ClasseRepository classeRepository;
@@ -76,5 +77,20 @@ public class ClasseController {
     }
 
     public record CreateClasseRequest(String nom, String role) {
+    }
+    
+    @GetMapping
+    public ResponseEntity<List<Classe>> getAllClasses() {
+        return ResponseEntity.ok(classeRepository.findAll());
+    }
+
+    /**
+     * Récupère une classe spécifique par son ID.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Classe> getClasseById(@PathVariable Integer id) {
+        return classeRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

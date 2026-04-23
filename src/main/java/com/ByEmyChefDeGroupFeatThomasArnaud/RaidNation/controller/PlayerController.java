@@ -16,13 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
 /**
  * API principale pour la gestion des players.
  * Fournit les operations de creation, suppression et gestion du lien player-classe.
  */
 @RestController
-@RequestMapping("/api/players")
+@RequestMapping("/players")
 public class PlayerController {
 
     private final PlayerRepository playerRepository;
@@ -132,5 +133,20 @@ public class PlayerController {
     }
 
     public record CreatePlayerRequest(String nom) {
+    }
+    
+    @GetMapping
+    public ResponseEntity<List<Player>> getAllPlayers() {
+        return ResponseEntity.ok(playerRepository.findAll());
+    }
+
+    /**
+     * Récupère un player spécifique par son ID.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Player> getPlayerById(@PathVariable Integer id) {
+        return playerRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

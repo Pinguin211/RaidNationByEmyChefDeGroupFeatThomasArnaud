@@ -1,6 +1,8 @@
 package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller;
 
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity.Groupe;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.entity.Player;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.GroupeRepository;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.PlayerRepository;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
  * Fournit les operations de creation, suppression et gestion du lien groupe-player.
  */
 @RestController
-@RequestMapping("/api/groupes")
+@RequestMapping("/groupes")
 public class GroupeController {
 
     private final GroupeRepository groupeRepository;
@@ -123,5 +125,20 @@ public class GroupeController {
     }
 
     public record CreateGroupeRequest(String nom) {
+    }
+    
+    @GetMapping
+    public ResponseEntity<List<Groupe>> getAllGroupes() {
+        return ResponseEntity.ok(groupeRepository.findAll());
+    }
+
+    /**
+     * Récupère un groupe spécifique par son ID.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Groupe> getGroupeById(@PathVariable Integer id) {
+        return groupeRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }

@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +29,7 @@ public class Classe {
     private String nom;
 
     @ManyToMany(mappedBy = "classes")
+    @JsonIgnoreProperties({"classes", "groupes"})
     private Set<Player> players = new HashSet<>();
 
     /** Constructeur par defaut requis par JPA. */
