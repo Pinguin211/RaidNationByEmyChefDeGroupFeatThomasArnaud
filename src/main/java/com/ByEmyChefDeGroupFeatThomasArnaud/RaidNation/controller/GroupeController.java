@@ -17,7 +17,7 @@ import java.util.List; // Ton import nécessaire pour getAllGroupes()
  * Fournit les operations de creation, suppression et gestion du lien groupe-player.
  */
 @RestController
-@RequestMapping("/groupes")
+@RequestMapping("/api/groupes")
 public class GroupeController {
 
     private final GroupeRepository groupeRepository;

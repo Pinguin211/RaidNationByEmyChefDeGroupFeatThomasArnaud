@@ -6,52 +6,28 @@ class IndexContent extends HTMLElement {
                 <p>Bienvenue sur la page principale construite avec le layout de base.</p>
             </section>
             <style>
-                .layout-root {
-                    display: flex;
-                    min-height: 100vh;
-                }
-
-                .app-bar {
-                    width: 260px;
-                    background: #111827;
-                    color: #f9fafb;
-                    padding: 24px 16px;
-                }
-
-                .app-bar h2 {
-                    margin-top: 0;
-                    margin-bottom: 16px;
-                    font-size: 22px;
-                }
-
-                .app-bar nav {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 8px;
-                }
-
-                .app-bar a {
-                    color: #93c5fd;
-                    text-decoration: none;
-                    font-weight: 600;
-                }
-
-                .layout-content {
-                    flex: 1;
-                    padding: 32px;
-                }
-
                 .index-content {
                     background: #ffffff;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 12px;
-                    padding: 24px;
-                    max-width: 760px;
+                    border: 1px solid #dbe4ef;
+                    border-radius: 16px;
+                    padding: 32px;
+                    max-width: 860px;
+                    width: 100%;
+                    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
                 }
 
                 .index-content h1 {
                     margin-top: 0;
-                    margin-bottom: 12px;
+                    margin-bottom: 10px;
+                    font-size: 32px;
+                    color: #0f172a;
+                }
+
+                .index-content p {
+                    margin: 0;
+                    font-size: 17px;
+                    line-height: 1.6;
+                    color: #334155;
                 }
             </style>
         `;

@@ -19,4 +19,14 @@ public class MainPageController {
     public String home() {
         return "forward:/index.html";
     }
+
+    /**
+     * Affiche la page principale d'ajout de classe.
+     *
+     * @return forward vers la page classes
+     */
+    @GetMapping({"/classes", "/classes/"})
+    public String classesPage() {
+        return "forward:/classes.html";
+    }
 }

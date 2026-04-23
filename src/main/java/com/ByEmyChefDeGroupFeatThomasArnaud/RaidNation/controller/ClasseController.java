@@ -22,7 +22,7 @@ import java.util.List;
  * Fournit les operations de creation et suppression.
  */
 @RestController
-@RequestMapping("/classes")
+@RequestMapping("/api/classes")
 public class ClasseController {
 
     private final ClasseRepository classeRepository;
