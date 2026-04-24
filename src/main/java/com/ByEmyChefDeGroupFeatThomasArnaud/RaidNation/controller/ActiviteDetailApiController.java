@@ -1,5 +1,16 @@
 package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Activite;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.ChasseTresor;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Classe;
@@ -7,39 +18,48 @@ import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Groupe;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Player;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Raid;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.ActiviteRepository;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.GroupeRepository;
 
 /**
- * API de detail des activites avec recap complet.
+ * API REST pour la gestion des données liées aux activités.
+ * Toutes les routes ici renvoient du JSON.
  */
 @RestController
 @RequestMapping("/api/activites")
 public class ActiviteDetailApiController {
 
+    private final GroupeRepository groupeRepository;
     private final ActiviteRepository activiteRepository;
 
-    public ActiviteDetailApiController(ActiviteRepository activiteRepository) {
+    public ActiviteDetailApiController(ActiviteRepository activiteRepository, GroupeRepository groupeRepository) {
         this.activiteRepository = activiteRepository;
+        this.groupeRepository = groupeRepository;
     }
 
     /**
-     * Retourne le detail complet d'une activite.
-     *
-     * @param id identifiant de l'activite
-     * @return recap detaille incluant groupes et players
+     * GET /api/activites
+     * Retourne la liste de TOUTES les activités (pour les modales de sélection par exemple).
+     */
+    @GetMapping
+    public ResponseEntity<List<Activite>> getAllActivites() {
+        return ResponseEntity.ok(activiteRepository.findAll());
+    }
+
+    /**
+     * GET /api/activites/{id}
+     * Récupère les activités liées à un Groupe (Parent).
+     * Note: /{id} ici correspond à l'ID du groupe pour lequel on veut les activités.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Set<Activite>> getActivitesByGroupe(@PathVariable Integer id) {
+        return groupeRepository.findById(id)
+            .map(parent -> ResponseEntity.ok(parent.getActivites()))
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * GET /api/activites/{id}/detail
+     * Retourne le détail complet formaté pour la page de détail d'une activité.
      */
     @GetMapping("/{id}/detail")
     @Transactional(readOnly = true)
@@ -49,11 +69,13 @@ public class ActiviteDetailApiController {
             return ResponseEntity.notFound().build();
         }
 
+        // Mapping des groupes
         List<GroupeRecap> groupes = activite.getGroupes().stream()
                 .sorted(Comparator.comparing(g -> g.getId() == null ? Integer.MAX_VALUE : g.getId()))
                 .map(this::toGroupeRecap)
                 .toList();
 
+        // Extraction unique des joueurs
         Map<Integer, PlayerRecap> playersMap = new LinkedHashMap<>();
         for (GroupeRecap groupe : groupes) {
             for (PlayerRecap player : groupe.players()) {
@@ -80,6 +102,8 @@ public class ActiviteDetailApiController {
 
         return ResponseEntity.ok(response);
     }
+
+    // --- Méthodes de transformation privées ---
 
     private GroupeRecap toGroupeRecap(Groupe groupe) {
         List<PlayerRecap> players = groupe.getPlayers().stream()
@@ -125,6 +149,8 @@ public class ActiviteDetailApiController {
         return new ActiviteMetadata("ACTIVITE", null, null, null, null, null);
     }
 
+    // --- Records pour la structure JSON ---
+
     private record ActiviteMetadata(
             String categorie,
             String nom,
@@ -132,8 +158,7 @@ public class ActiviteDetailApiController {
             String difficulte,
             Boolean isFarmSession,
             Integer nbCartes
-    ) {
-    }
+    ) {}
 
     public record ActiviteDetailResponse(
             Long id,
@@ -146,27 +171,23 @@ public class ActiviteDetailApiController {
             Integer nbCartes,
             List<GroupeRecap> groupes,
             List<PlayerRecap> players
-    ) {
-    }
+    ) {}
 
     public record GroupeRecap(
             Integer id,
             String nom,
             List<PlayerRecap> players
-    ) {
-    }
+    ) {}
 
     public record PlayerRecap(
             Integer id,
             String nom,
             List<ClasseRecap> classes
-    ) {
-    }
+    ) {}
 
     public record ClasseRecap(
             Integer id,
             String nom,
             String role
-    ) {
-    }
+    ) {}
 }

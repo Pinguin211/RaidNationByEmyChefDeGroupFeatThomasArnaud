@@ -27,21 +27,19 @@ class GroupCreateContent extends HTMLElement {
                         </tbody>
                     </table>
                 </div>
-
                 <p id="global-message" class="global-message"></p>
             </section>
 
-            <div id="groupe-modal" class="modal-backdrop hidden" aria-hidden="true">
-                <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div id="groupe-modal" class="modal-backdrop hidden">
+                <div class="modal-card">
                     <div class="modal-header">
-                        <h2 id="modal-title">Ajouter un groupe</h2>
-                        <button id="close-modal-btn" class="icon-btn" type="button" aria-label="Fermer">×</button>
+                        <h2>Ajouter un groupe</h2>
+                        <button id="close-modal-btn" class="icon-btn">×</button>
                     </div>
-                    <form id="groupe-create-form" novalidate>
+                    <form id="groupe-create-form">
                         <div class="field">
                             <label for="nom">Nom du groupe</label>
-                            <input id="nom" name="nom" type="text" placeholder="Ex: Les tryharders" required maxlength="60">
-                            <small class="error" data-error-for="nom"></small>
+                            <input id="nom" name="nom" type="text" placeholder="Ex: Les tryharders" required>
                         </div>
                         <div class="actions">
                             <button class="primary-btn" type="submit">Créer le groupe</button>
@@ -50,379 +48,197 @@ class GroupCreateContent extends HTMLElement {
                 </div>
             </div>
 
-            <div id="assign-modal" class="modal-backdrop hidden" aria-hidden="true">
-                <div class="modal-card" role="dialog" aria-modal="true">
+            <div id="assign-modal" class="modal-backdrop hidden">
+                <div class="modal-card">
                     <div class="modal-header">
                         <h2 id="assign-modal-title">Gérer les joueurs</h2>
-                        <button id="close-assign-modal-btn" class="icon-btn" type="button" aria-label="Fermer">×</button>
+                        <button id="close-assign-modal-btn" class="icon-btn">×</button>
                     </div>
-                    <div class="assign-list-container">
-                        <div id="players-list" class="players-list">
-                            <p class="empty-row">Chargement des joueurs...</p>
-                        </div>
-                    </div>
+                    <div id="players-list" class="players-list"></div>
                 </div>
             </div>
 
-            <div id="activite-modal" class="modal-backdrop hidden" aria-hidden="true">
-                <div class="modal-card" role="dialog" aria-modal="true">
+            <div id="activite-modal" class="modal-backdrop hidden">
+                <div class="modal-card">
                     <div class="modal-header">
                         <h2 id="activite-modal-title">Inscrire à une activité</h2>
-                        <button id="close-activite-modal-btn" class="icon-btn" type="button" aria-label="Fermer">×</button>
+                        <button id="close-activite-modal-btn" class="icon-btn">×</button>
                     </div>
-                    <div class="assign-list-container">
-                        <div id="activites-list" class="players-list">
-                            <p class="empty-row">Chargement des activités...</p>
-                        </div>
-                    </div>
+                    <div id="activites-list" class="players-list"></div>
                 </div>
             </div>
 
             <style>
-                /* --- CSS de base --- */
-                .class-create-content { max-width: 980px; width: 100%; background: #ffffff; border: 1px solid #dbe4ef; border-radius: 16px; box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08); padding: 28px; }
-                .page-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
-                .page-header h1 { margin: 0 0 6px 0; font-size: 30px; color: #0f172a; }
-                .page-header p { margin: 0; color: #475569; }
-                .primary-btn { border: none; background: #2563eb; color: #ffffff; padding: 11px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25); }
-                .primary-btn:hover { background: #1d4ed8; }
-                .table-wrapper { border: 1px solid #dbe4ef; border-radius: 12px; overflow: hidden; background: #ffffff; }
+                .class-create-content { max-width: 980px; width: 100%; background: #ffffff; border: 1px solid #dbe4ef; border-radius: 16px; padding: 28px; box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08); }
+                .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+                .primary-btn { border: none; background: #2563eb; color: #ffffff; padding: 11px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+                .table-wrapper { border: 1px solid #dbe4ef; border-radius: 12px; overflow: hidden; }
                 table { width: 100%; border-collapse: collapse; }
-                thead { background: #f8fafc; }
                 th, td { padding: 13px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; }
-                th { color: #334155; font-weight: 700; font-size: 14px; }
-                tbody tr:last-child td { border-bottom: none; }
-                .empty-row { text-align: center; color: #64748b; }
-                
-                /* --- Boutons et Badges --- */
-                .delete-btn { border: none; background: #dc2626; color: #ffffff; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-                .delete-btn:hover { background: #b91c1c; }
-                .assign-btn { border: none; background: #0ea5e9; color: #ffffff; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 6px; }
-                .assign-btn:hover { background: #0284c7; }
-                .activite-btn { border: none; background: #8b5cf6; color: #ffffff; padding: 8px 10px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 6px; }
-                .activite-btn:hover { background: #7c3aed; }
                 .badge { background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block; margin-bottom: 4px;}
                 .badge-act { background: #e0e7ff; color: #3730a3; padding: 4px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block; }
-                
-                /* --- CSS Modales --- */
-                .global-message { min-height: 20px; margin-top: 12px; font-weight: 600; }
-                .global-message.success { color: #166534; }
-                .global-message.error { color: #b91c1c; }
-                .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.52); display: flex; justify-content: center; align-items: center; padding: 20px; z-index: 20; }
+                .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; justify-content: center; align-items: center; z-index: 100; }
                 .modal-backdrop.hidden { display: none; }
-                .modal-card { width: 100%; max-width: 520px; background: #ffffff; border-radius: 14px; box-shadow: 0 18px 40px rgba(15, 23, 42, 0.28); border: 1px solid #dbe4ef; padding: 20px; }
-                .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-                .modal-header h2 { margin: 0; font-size: 24px; }
-                .icon-btn { border: none; background: #e2e8f0; color: #334155; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 22px; line-height: 1; }
-                .icon-btn:hover { background: #cbd5e1; }
-                #groupe-create-form { display: grid; gap: 14px; }
-                .field { display: grid; gap: 6px; }
-                label { font-weight: 700; color: #1e293b; }
-                input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f8fafc; outline: none; transition: border-color 120ms ease-in-out, box-shadow 120ms ease-in-out; }
-                input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
-                input.invalid { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12); }
-                .error { color: #b91c1c; min-height: 16px; font-size: 13px; }
-                .actions { display: flex; justify-content: flex-end; }
-                
-                /* --- CSS Listes (Joueurs & Activités) --- */
-                .assign-list-container { max-height: 350px; overflow-y: auto; padding-right: 8px; margin-top: 15px; }
-                .players-list { display: flex; flex-direction: column; gap: 10px; }
-                .player-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; }
-                .player-name { font-weight: 600; color: #0f172a; }
-                .act-info { display: flex; flex-direction: column; }
-                .act-type { font-size: 12px; color: #64748b; }
+                .modal-card { width: 100%; max-width: 520px; background: #ffffff; border-radius: 14px; padding: 20px; max-height: 80vh; overflow-y: auto; }
+                .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+                .icon-btn { border: none; background: #e2e8f0; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+                .player-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; background: #f8fafc; }
                 .btn-add { background: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-                .btn-add:hover { background: #15803d; }
-                .btn-remove { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-                .btn-remove:hover { background: #dc2626; }
+                .btn-remove { background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+                .modale-section h3 { font-size: 14px; margin: 15px 0 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
             </style>
         `;
 
-        // --- Récupération des éléments du DOM ---
         const tableBody = this.querySelector("#groupes-table-body");
-        const openModalBtn = this.querySelector("#open-modal-btn");
-        const closeModalBtn = this.querySelector("#close-modal-btn");
         const modal = this.querySelector("#groupe-modal");
-        const form = this.querySelector("#groupe-create-form");
-        const nomInput = this.querySelector("#nom");
+        const assignModal = this.querySelector("#assign-modal");
+        const activiteModal = this.querySelector("#activite-modal");
+        const activitesListEl = this.querySelector("#activites-list");
+        const playersListEl = this.querySelector("#players-list");
         const messageEl = this.querySelector("#global-message");
 
-        const assignModal = this.querySelector("#assign-modal");
-        const closeAssignModalBtn = this.querySelector("#close-assign-modal-btn");
-        const playersListEl = this.querySelector("#players-list");
-        const assignModalTitle = this.querySelector("#assign-modal-title");
-
-        const activiteModal = this.querySelector("#activite-modal");
-        const closeActiviteModalBtn = this.querySelector("#close-activite-modal-btn");
-        const activitesListEl = this.querySelector("#activites-list");
-        const activiteModalTitle = this.querySelector("#activite-modal-title");
-
-        // Données en mémoire
         let currentGroupes = [];
         let selectedGroupId = null;
-
-        // --- Utilitaires ---
-        const setFieldError = (field, message) => {
-            const errorEl = this.querySelector(`[data-error-for="${field.name}"]`);
-            if (errorEl) errorEl.textContent = message;
-            field.classList.toggle("invalid", Boolean(message));
-        };
-
-        const showMessage = (message, type = "") => {
-            messageEl.textContent = message;
-            messageEl.className = "global-message";
-            if (type) messageEl.classList.add(type);
-            setTimeout(() => messageEl.textContent = "", 4000); 
-        };
-
-        const validateField = (field) => {
-            if (field.value.trim().length < 2) {
-                setFieldError(field, "Minimum 2 caractères.");
-                return false;
-            }
-            setFieldError(field, "");
-            return true;
-        };
-
-        // --- Modale 1 : Création ---
-        const openModal = () => {
-            modal.classList.remove("hidden");
-            nomInput.focus();
-        };
-
-        const closeModal = () => {
-            modal.classList.add("hidden");
-            form.reset();
-            setFieldError(nomInput, "");
-        };
-
-        // --- Modale 2 : Joueurs ---
-        const openAssignModal = async (groupId) => {
-            selectedGroupId = groupId;
-            const group = currentGroupes.find(g => g.id == groupId);
-            assignModalTitle.textContent = `Joueurs : ${group.nom}`;
-            assignModal.classList.remove("hidden");
-            await renderPlayersList();
-        };
-
-        const closeAssignModal = () => {
-            assignModal.classList.add("hidden");
-            selectedGroupId = null;
-        };
-
-        const renderPlayersList = async () => {
-            try {
-                const response = await fetch("/api/players");
-                const allPlayers = await response.json();
-                const group = currentGroupes.find(g => g.id == selectedGroupId);
-                const playersInGroupIds = group.players ? group.players.map(p => p.id) : [];
-
-                if (allPlayers.length === 0) {
-                    playersListEl.innerHTML = `<p class="empty-row">Aucun joueur dans la base de données.</p>`;
-                    return;
-                }
-
-                playersListEl.innerHTML = allPlayers.map(player => {
-                    const isInGroup = playersInGroupIds.includes(player.id);
-                    return `
-                        <div class="player-item">
-                            <span class="player-name">${player.nom}</span>
-                            ${isInGroup 
-                                ? `<button class="btn-remove" data-action="remove-player" data-pid="${player.id}">Retirer</button>`
-                                : `<button class="btn-add" data-action="add-player" data-pid="${player.id}">Ajouter</button>`
-                            }
-                        </div>
-                    `;
-                }).join("");
-
-            } catch (error) {
-                playersListEl.innerHTML = `<p class="error">Erreur lors du chargement des joueurs.</p>`;
-            }
-        };
-
-        playersListEl.addEventListener("click", async (e) => {
-            const action = e.target.getAttribute("data-action");
-            const playerId = e.target.getAttribute("data-pid");
-            if (!action || !playerId) return;
-
-            const method = action === "add-player" ? "POST" : "DELETE";
-            try {
-                const response = await fetch(`/api/groupes/${selectedGroupId}/players/${playerId}`, { method });
-                if (response.ok) {
-                    await loadGroupes(); 
-                    await renderPlayersList(); 
-                } else { alert("Erreur lors de l'opération."); }
-            } catch (err) { alert("Erreur réseau."); }
-        });
-
-        // --- Modale 3 : Activités ---
-        const openActiviteModal = async (groupId) => {
-            selectedGroupId = groupId;
-            const group = currentGroupes.find(g => g.id == groupId);
-            activiteModalTitle.textContent = `Activités : ${group.nom}`;
-            activiteModal.classList.remove("hidden");
-            await renderActivitesList();
-        };
-
-        const closeActiviteModal = () => {
-            activiteModal.classList.add("hidden");
-            selectedGroupId = null;
-        };
-
-        const renderActivitesList = async () => {
-            try {
-                const response = await fetch("/api/activites");
-                const allActivites = await response.json();
-                const group = currentGroupes.find(g => g.id == selectedGroupId);
-                const activitesInGroupIds = group.activites ? group.activites.map(a => a.id) : [];
-
-                if (allActivites.length === 0) {
-                    activitesListEl.innerHTML = `<p class="empty-row">Aucune activité trouvée.</p>`;
-                    return;
-                }
-
-                activitesListEl.innerHTML = allActivites.map(act => {
-                    const isInGroup = activitesInGroupIds.includes(act.id);
-                    // On gère l'affichage du type s'il existe (pour différencier Raid et Chasse)
-                    const typeLabel = act.type ? act.type : "Activité";
-                    return `
-                        <div class="player-item">
-                            <div class="act-info">
-                                <span class="player-name">Activité #${act.id}</span>
-                                <span class="act-type">${typeLabel}</span>
-                            </div>
-                            ${isInGroup 
-                                ? `<button class="btn-remove" data-action="remove-act" data-aid="${act.id}">Retirer</button>`
-                                : `<button class="btn-add" data-action="add-act" data-aid="${act.id}">Inscrire</button>`
-                            }
-                        </div>
-                    `;
-                }).join("");
-
-            } catch (error) {
-                activitesListEl.innerHTML = `<p class="error">Erreur lors du chargement des activités.</p>`;
-            }
-        };
-
-        activitesListEl.addEventListener("click", async (e) => {
-            const action = e.target.getAttribute("data-action");
-            const activiteId = e.target.getAttribute("data-aid");
-            if (!action || !activiteId) return;
-
-            const method = action === "add-act" ? "POST" : "DELETE";
-            try {
-                const response = await fetch(`/api/groupes/${selectedGroupId}/activites/${activiteId}`, { method });
-                if (response.ok) {
-                    await loadGroupes(); 
-                    await renderActivitesList(); 
-                } else { alert("Erreur lors de l'opération."); }
-            } catch (err) { alert("Erreur réseau."); }
-        });
-
-
-        // --- Tableau principal ---
-        const renderRows = (groupes) => {
-            if (!Array.isArray(groupes) || groupes.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="4" class="empty-row">Aucun groupe disponible.</td></tr>`;
-                return;
-            }
-
-            tableBody.innerHTML = groupes.map((groupe) => {
-                const nbJoueurs = groupe.players ? groupe.players.length : 0;
-                const nbActivites = groupe.activites ? groupe.activites.length : 0;
-                return `
-                    <tr>
-                        <td>${groupe.id}</td>
-                        <td><strong>${groupe.nom}</strong></td>
-                        <td>
-                            <span class="badge">${nbJoueurs} joueur(s)</span><br/>
-                            <span class="badge-act">${nbActivites} activité(s)</span>
-                        </td>
-                        <td>
-                            <button class="assign-btn" data-assign-id="${groupe.id}">Joueurs</button>
-                            <button class="activite-btn" data-act-id="${groupe.id}">Activités</button>
-                            <button class="delete-btn" data-id="${groupe.id}">Supprimer</button>
-                        </td>
-                    </tr>
-                `;
-            }).join("");
-        };
 
         const loadGroupes = async () => {
             try {
                 const response = await fetch("/api/groupes");
-                if (!response.ok) throw new Error();
                 currentGroupes = await response.json();
-                renderRows(currentGroupes);
-            } catch (error) {
-                renderRows([]);
-                showMessage("Erreur réseau lors du chargement des groupes.", "error");
-            }
+                renderTable();
+            } catch (error) { console.error(error); }
         };
 
-        const deleteGroupe = async (id) => {
-            try {
-                const response = await fetch(`/api/groupes/${id}`, { method: "DELETE" });
-                if (!response.ok) throw new Error();
-                showMessage("Groupe supprimé.", "success");
-                await loadGroupes();
-            } catch (error) {
-                showMessage("Erreur pendant la suppression.", "error");
-            }
+        const renderTable = () => {
+            tableBody.innerHTML = currentGroupes.map(g => `
+                <tr>
+                    <td>${g.id}</td>
+                    <td><strong>${g.nom}</strong></td>
+                    <td>
+                        <span class="badge">${g.players?.length || 0} joueur(s)</span><br/>
+                        <span class="badge-act">${g.activites?.length || 0} activité(s)</span>
+                    </td>
+                    <td>
+                        <button class="primary-btn btn-manage-players" data-id="${g.id}" style="background:#0ea5e9"> 
+							<svg viewBox="0 0 91 91" enable-background="new 0 0 91 91" id="Layer_1" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M43.77,52.37c14.094,0,25.563-11.551,25.563-25.746S57.863,0.88,43.77,0.88 c-14.092,0-25.555,11.549-25.555,25.744S29.678,52.37,43.77,52.37z M52.189,20.823h3.5c1.43,0,2.592,1.16,2.592,2.594 s-1.162,2.594-2.592,2.594h-3.5c-1.434,0-2.594-1.16-2.594-2.594S50.756,20.823,52.189,20.823z M32.301,20.823h3.502 c1.432,0,2.594,1.16,2.594,2.594s-1.162,2.594-2.594,2.594h-3.502c-1.436,0-2.594-1.16-2.594-2.594S30.865,20.823,32.301,20.823z M31.412,31.599c1.355-0.459,2.83,0.26,3.293,1.613c1.344,3.932,4.988,6.572,9.066,6.572c4.074,0,7.721-2.641,9.07-6.574 c0.465-1.354,1.93-2.074,3.291-1.609c1.357,0.465,2.08,1.939,1.613,3.293c-2.068,6.027-7.686,10.076-13.975,10.076 c-6.297,0-11.912-4.049-13.973-10.08C29.334,33.536,30.057,32.062,31.412,31.599z" fill="#ffffff"></path> <path d="M65.572,48.407C60,54.052,52.287,57.556,43.77,57.556c-8.432,0-16.076-3.438-21.637-8.986 c-6.846,3.301-10.23,8.203-10.23,14.992v17.645c3.43,1.9,11.766,8.836,32.285,8.836c20.705,0,29.332-6.783,31.904-8.619V63.558 C76.092,56.64,72.613,51.685,65.572,48.407z" fill="#ffffff"></path> </g> </g> </g></svg>
+							Joueurs
+						</button>
+                        <button class="primary-btn btn-manage-activities" data-id="${g.id}" style="background:#8b5cf6">
+						<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16 0H13L3.70711 9.29289L2.20711 7.79289L0.792893 9.20711L3.08579 11.5L1.5835 13.0023C1.55586 13.0008 1.52802 13 1.5 13C0.671573 13 0 13.6716 0 14.5C0 15.3284 0.671573 16 1.5 16C2.32843 16 3 15.3284 3 14.5C3 14.472 2.99923 14.4441 2.99771 14.4165L4.5 12.9142L6.79289 15.2071L8.20711 13.7929L6.70711 12.2929L16 3V0Z" fill="#ffffff"></path> </g></svg>
+							Activités
+						</button>
+                        <button class="primary-btn btn-delete-group" data-id="${g.id}" style="background:#dc2626">
+							<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+							  <path fill-rule="evenodd" d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z" clip-rule="evenodd"/>
+							</svg>
+						</button>
+                    </td>
+                </tr>
+            `).join("");
         };
 
-        // --- Events Listeners de base ---
-        openModalBtn.addEventListener("click", openModal);
-        closeModalBtn.addEventListener("click", closeModal);
-        closeAssignModalBtn.addEventListener("click", closeAssignModal);
-        closeActiviteModalBtn.addEventListener("click", closeActiviteModal);
-        
-        // Fermer les modales en cliquant à l'extérieur
-        modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-        assignModal.addEventListener("click", (e) => { if (e.target === assignModal) closeAssignModal(); });
-        activiteModal.addEventListener("click", (e) => { if (e.target === activiteModal) closeActiviteModal(); });
-
-        nomInput.addEventListener("input", () => validateField(nomInput));
-
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            if (!validateField(nomInput)) return;
-
+        // Rendu de la liste des activités avec DEUX SECTIONS
+        this.renderActivitesList = async () => {
             try {
-                const response = await fetch("/api/groupes", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ nom: nomInput.value.trim() })
-                });
+                const response = await fetch("/api/activites");
+                const allActivites = await response.json();
+                const group = currentGroupes.find(g => g.id == selectedGroupId);
+                const currentIds = group.activites?.map(a => a.id) || [];
 
-                if (!response.ok) throw new Error();
+                const inscrites = allActivites.filter(act => currentIds.includes(act.id));
+                const disponibles = allActivites.filter(act => !currentIds.includes(act.id));
 
-                closeModal();
-                showMessage("Groupe créé avec succès.", "success");
-                await loadGroupes();
-            } catch (error) {
-                showMessage("Erreur pendant la création.", "error");
-            }
+                const itemHtml = (act, isIn) => `
+                    <div class="player-item" style="${isIn ? 'border-left: 4px solid #8b5cf6;' : ''}">
+                        <div><strong>${act.nom || act.type}</strong><br><small>ID: ${act.id}</small></div>
+                        <button class="${isIn ? 'btn-remove' : 'btn-add'}" data-aid="${act.id}" data-action="${isIn ? 'remove' : 'add'}">
+                            ${isIn ? 'Retirer' : 'Inscrire'}
+                        </button>
+                    </div>`;
+
+                activitesListEl.innerHTML = `
+                    <div class="modale-section">
+                        <h3>
+						<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+						  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11.917 9.724 16.5 19 7.5"/>
+						</svg>
+
+						 Inscrites (${inscrites.length})
+						 </h3>
+                        ${inscrites.length > 0 ? inscrites.map(a => itemHtml(a, true)).join("") : '<p>Aucune activité.</p>'}
+                    </div>
+                    <div class="modale-section">
+                        <h3>
+						<svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+						  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14m-7 7V5"/>
+						</svg>
+
+						 Disponibles (${disponibles.length})</h3>
+                        ${disponibles.length > 0 ? disponibles.map(a => itemHtml(a, false)).join("") : '<p>Tout est inscrit !</p>'}
+                    </div>`;
+            } catch (e) { activitesListEl.innerHTML = "Erreur API"; }
+        };
+
+        this.renderPlayersList = async () => {
+            try {
+                const response = await fetch("/api/players");
+                const allPlayers = await response.json();
+                const group = currentGroupes.find(g => g.id == selectedGroupId);
+                const currentIds = group.players?.map(p => p.id) || [];
+
+                playersListEl.innerHTML = allPlayers.map(p => {
+                    const isIn = currentIds.includes(p.id);
+                    return `<div class="player-item">
+                        <span><strong>${p.nom}</strong></span>
+                        <button class="${isIn ? 'btn-remove' : 'btn-add'}" data-pid="${p.id}" data-action="${isIn ? 'remove' : 'add'}">
+                            ${isIn ? 'Retirer' : 'Ajouter'}
+                        </button>
+                    </div>`;
+                }).join("");
+            } catch (e) { playersListEl.innerHTML = "Erreur API"; }
+        };
+
+        // Gestion des événements
+        tableBody.addEventListener("click", (e) => {
+            const btn = e.target.closest("button");
+            if (!btn) return;
+            const id = btn.dataset.id;
+            if (btn.classList.contains("btn-manage-activities")) { selectedGroupId = id; activiteModal.classList.remove("hidden"); this.renderActivitesList(); }
+            if (btn.classList.contains("btn-manage-players")) { selectedGroupId = id; assignModal.classList.remove("hidden"); this.renderPlayersList(); }
+            if (btn.classList.contains("btn-delete-group")) this.deleteGroupe(id);
         });
 
-        tableBody.addEventListener("click", async (event) => {
-            if (event.target.matches(".delete-btn")) {
-                const id = event.target.getAttribute("data-id");
-                if (confirm("Supprimer ce groupe ?")) await deleteGroupe(id);
-            }
-            if (event.target.matches(".assign-btn")) {
-                const id = event.target.getAttribute("data-assign-id");
-                await openAssignModal(id);
-            }
-            if (event.target.matches(".activite-btn")) {
-                const id = event.target.getAttribute("data-act-id");
-                await openActiviteModal(id);
-            }
+        activitesListEl.addEventListener("click", async (e) => {
+            const btn = e.target.closest("button");
+            if (!btn) return;
+            const method = btn.dataset.action === "add" ? "POST" : "DELETE";
+            await fetch(`/api/groupes/${selectedGroupId}/activites/${btn.dataset.aid}`, { method });
+            await loadGroupes(); await this.renderActivitesList();
         });
 
-        // Chargement initial
+        playersListEl.addEventListener("click", async (e) => {
+            const btn = e.target.closest("button");
+            if (!btn) return;
+            const method = btn.dataset.action === "add" ? "POST" : "DELETE";
+            await fetch(`/api/groupes/${selectedGroupId}/players/${btn.dataset.pid}`, { method });
+            await loadGroupes(); await this.renderPlayersList();
+        });
+
+        this.querySelector("#close-modal-btn").onclick = () => modal.classList.add("hidden");
+        this.querySelector("#close-assign-modal-btn").onclick = () => assignModal.classList.add("hidden");
+        this.querySelector("#close-activite-modal-btn").onclick = () => activiteModal.classList.add("hidden");
+        this.querySelector("#open-modal-btn").onclick = () => modal.classList.remove("hidden");
+
         loadGroupes();
+    }
+
+    async deleteGroupe(id) {
+        if (confirm("Supprimer ce groupe ?")) {
+            await fetch(`/api/groupes/${id}`, { method: "DELETE" });
+            window.location.reload();
+        }
     }
 }
 
-customElements.define("group-create-content", GroupCreateContent);
+if (!customElements.get("group-create-content")) {
+    customElements.define("group-create-content", GroupCreateContent);
+}
