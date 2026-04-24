@@ -111,7 +111,7 @@ class RaidCreateContent extends HTMLElement {
         const form = this.querySelector("#raid-create-form");
         const messageEl = this.querySelector("#global-message");
 
-        const API_VIEW = "/test/api/raids";
+        const API_VIEW = "/api/raids";
         const API_WRITE = "/api/raids";
 
         const showMessage = (msg, type = "") => {

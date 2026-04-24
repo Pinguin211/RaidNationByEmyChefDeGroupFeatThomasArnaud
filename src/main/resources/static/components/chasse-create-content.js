@@ -99,7 +99,7 @@ class ChasseCreateContent extends HTMLElement {
         const form = this.querySelector("#chasse-create-form");
         const messageEl = this.querySelector("#global-message");
 
-        const API_VIEW = "/test/api/chasses";
+        const API_VIEW = "/api/chasses";
         const API_WRITE = "/api/chasses";
 
         const showMessage = (msg, type = "") => {
