@@ -5,6 +5,11 @@ import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Groupe;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Player;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.ClasseRepository;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.PlayerRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +32,7 @@ import java.util.Set;
  */
 @RestController
 @RequestMapping("/api/players")
+@Tag(name = "Players", description = "Gestion des joueurs et de leurs classes")
 public class PlayerController {
 
     private final PlayerRepository playerRepository;
@@ -44,6 +50,11 @@ public class PlayerController {
      * @return le player cree ou 400 si invalide
      */
     @PostMapping
+    @Operation(summary = "Creer un player")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Player cree"),
+            @ApiResponse(responseCode = "400", description = "Payload invalide", content = @Content)
+    })
     public ResponseEntity<Player> createPlayer(@RequestBody CreatePlayerRequest request) {
         if (request.nom() == null || request.nom().isBlank()) {
             return ResponseEntity.badRequest().build();
@@ -64,6 +75,12 @@ public class PlayerController {
      */
     @PutMapping("/{id}")
     @Transactional
+    @Operation(summary = "Modifier un player")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Player modifie"),
+            @ApiResponse(responseCode = "400", description = "Payload invalide", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Player introuvable", content = @Content)
+    })
     public ResponseEntity<Player> updatePlayer(@PathVariable Integer id, @RequestBody UpdatePlayerRequest request) {
         if (request.nom() == null || request.nom().isBlank()) {
             return ResponseEntity.badRequest().build();
@@ -103,6 +120,11 @@ public class PlayerController {
      */
     @DeleteMapping("/{id}")
     @Transactional
+    @Operation(summary = "Supprimer un player")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Player supprime"),
+            @ApiResponse(responseCode = "404", description = "Player introuvable", content = @Content)
+    })
     public ResponseEntity<Void> deletePlayer(@PathVariable Integer id) {
         Player player = playerRepository.findById(id).orElse(null);
         if (player == null) {
@@ -136,6 +158,11 @@ public class PlayerController {
      */
     @PostMapping("/{playerId}/classes/{classeId}")
     @Transactional
+    @Operation(summary = "Associer une classe a un player")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Association creee"),
+            @ApiResponse(responseCode = "404", description = "Player ou classe introuvable", content = @Content)
+    })
     public ResponseEntity<Void> addClasseToPlayer(@PathVariable Integer playerId, @PathVariable Integer classeId) {
         Player player = playerRepository.findById(playerId).orElse(null);
         Classe classe = classeRepository.findById(classeId).orElse(null);
@@ -160,6 +187,11 @@ public class PlayerController {
      */
     @DeleteMapping("/{playerId}/classes/{classeId}")
     @Transactional
+    @Operation(summary = "Retirer une classe d'un player")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Association supprimee"),
+            @ApiResponse(responseCode = "404", description = "Player ou classe introuvable", content = @Content)
+    })
     public ResponseEntity<Void> removeClasseFromPlayer(@PathVariable Integer playerId, @PathVariable Integer classeId) {
         Player player = playerRepository.findById(playerId).orElse(null);
         Classe classe = classeRepository.findById(classeId).orElse(null);
@@ -182,6 +214,8 @@ public class PlayerController {
     }
     
     @GetMapping
+    @Operation(summary = "Lister tous les players")
+    @ApiResponse(responseCode = "200", description = "Liste des players")
     public ResponseEntity<List<Player>> getAllPlayers() {
         return ResponseEntity.ok(playerRepository.findAll());
     }
@@ -190,6 +224,11 @@ public class PlayerController {
      * Récupère un player spécifique par son ID.
      */
     @GetMapping("/{id}")
+    @Operation(summary = "Recuperer un player par ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Player trouve"),
+            @ApiResponse(responseCode = "404", description = "Player introuvable", content = @Content)
+    })
     public ResponseEntity<Player> getPlayerById(@PathVariable Integer id) {
         return playerRepository.findById(id)
                 .map(ResponseEntity::ok)

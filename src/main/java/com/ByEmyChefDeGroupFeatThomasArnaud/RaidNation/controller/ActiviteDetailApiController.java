@@ -7,6 +7,11 @@ import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Groupe;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Player;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Raid;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.ActiviteRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +32,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/activites")
+@Tag(name = "Activites", description = "Consultation detaillee des activites")
 public class ActiviteDetailApiController {
 
     private final ActiviteRepository activiteRepository;
@@ -43,6 +49,11 @@ public class ActiviteDetailApiController {
      */
     @GetMapping("/{id}/detail")
     @Transactional(readOnly = true)
+    @Operation(summary = "Recuperer le detail complet d'une activite")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Detail d'activite retourne"),
+            @ApiResponse(responseCode = "404", description = "Activite introuvable", content = @Content)
+    })
     public ResponseEntity<ActiviteDetailResponse> getActiviteDetail(@PathVariable Long id) {
         Activite activite = activiteRepository.findById(id).orElse(null);
         if (activite == null) {

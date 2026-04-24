@@ -6,6 +6,11 @@ import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.GroupeReposito
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.PlayerRepository;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.ActiviteRepository;
 import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.model.Activite;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +25,7 @@ import java.util.List; // Ton import nécessaire pour getAllGroupes()
  */
 @RestController
 @RequestMapping("/api/groupes")
+@Tag(name = "Groupes", description = "Gestion des groupes et associations players/activites")
 public class GroupeController {
 
     private final GroupeRepository groupeRepository;
@@ -39,6 +45,11 @@ public class GroupeController {
      * @return le groupe cree ou 400 si invalide
      */
     @PostMapping
+    @Operation(summary = "Creer un groupe")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Groupe cree"),
+            @ApiResponse(responseCode = "400", description = "Payload invalide", content = @Content)
+    })
     public ResponseEntity<Groupe> createGroupe(@RequestBody CreateGroupeRequest request) {
         if (request.nom() == null || request.nom().isBlank()) {
             return ResponseEntity.badRequest().build();
@@ -58,6 +69,11 @@ public class GroupeController {
      */
     @DeleteMapping("/{id}")
     @Transactional
+    @Operation(summary = "Supprimer un groupe")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Groupe supprime"),
+            @ApiResponse(responseCode = "404", description = "Groupe introuvable", content = @Content)
+    })
     public ResponseEntity<Void> deleteGroupe(@PathVariable Integer id) {
         Groupe groupe = groupeRepository.findById(id).orElse(null);
         if (groupe == null) {
@@ -83,6 +99,11 @@ public class GroupeController {
      */
     @PostMapping("/{groupeId}/players/{playerId}")
     @Transactional
+    @Operation(summary = "Associer un player a un groupe")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Association creee"),
+            @ApiResponse(responseCode = "404", description = "Groupe ou player introuvable", content = @Content)
+    })
     public ResponseEntity<Void> addPlayerToGroupe(@PathVariable Integer groupeId, @PathVariable Integer playerId) {
         Groupe groupe = groupeRepository.findById(groupeId).orElse(null);
         Player player = playerRepository.findById(playerId).orElse(null);
@@ -107,6 +128,11 @@ public class GroupeController {
      */
     @DeleteMapping("/{groupeId}/players/{playerId}")
     @Transactional
+    @Operation(summary = "Retirer un player d'un groupe")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Association supprimee"),
+            @ApiResponse(responseCode = "404", description = "Groupe ou player introuvable", content = @Content)
+    })
     public ResponseEntity<Void> removePlayerFromGroupe(@PathVariable Integer groupeId, @PathVariable Integer playerId) {
         Groupe groupe = groupeRepository.findById(groupeId).orElse(null);
         Player player = playerRepository.findById(playerId).orElse(null);
@@ -126,6 +152,8 @@ public class GroupeController {
     }
     
     @GetMapping
+    @Operation(summary = "Lister tous les groupes")
+    @ApiResponse(responseCode = "200", description = "Liste des groupes")
     public ResponseEntity<List<Groupe>> getAllGroupes() {
         return ResponseEntity.ok(groupeRepository.findAll());
     }
@@ -134,6 +162,11 @@ public class GroupeController {
      * Récupère un groupe spécifique par son ID.
      */
     @GetMapping("/{id}")
+    @Operation(summary = "Recuperer un groupe par ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Groupe trouve"),
+            @ApiResponse(responseCode = "404", description = "Groupe introuvable", content = @Content)
+    })
     public ResponseEntity<Groupe> getGroupeById(@PathVariable Integer id) {
         return groupeRepository.findById(id)
                 .map(ResponseEntity::ok)
@@ -149,6 +182,11 @@ public class GroupeController {
      */
     @PostMapping("/{groupeId}/activites/{activiteId}")
     @Transactional
+    @Operation(summary = "Associer une activite a un groupe")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Association creee"),
+            @ApiResponse(responseCode = "404", description = "Groupe ou activite introuvable", content = @Content)
+    })
     public ResponseEntity<Void> addActiviteToGroupe(@PathVariable Integer groupeId, @PathVariable Long activiteId) {
         Groupe groupe = groupeRepository.findById(groupeId).orElse(null);
         Activite activite = activiteRepository.findById(activiteId).orElse(null);
@@ -172,6 +210,11 @@ public class GroupeController {
      */
     @DeleteMapping("/{groupeId}/activites/{activiteId}")
     @Transactional
+    @Operation(summary = "Retirer une activite d'un groupe")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Association supprimee"),
+            @ApiResponse(responseCode = "404", description = "Groupe ou activite introuvable", content = @Content)
+    })
     public ResponseEntity<Void> removeActiviteFromGroupe(@PathVariable Integer groupeId, @PathVariable Long activiteId) {
         Groupe groupe = groupeRepository.findById(groupeId).orElse(null);
         Activite activite = activiteRepository.findById(activiteId).orElse(null);
