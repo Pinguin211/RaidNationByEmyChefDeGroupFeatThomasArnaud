@@ -15,6 +15,7 @@ class ClassCreateContent extends HTMLElement {
                         <thead>
                         <tr>
                             <th>ID</th>
+							<th></th>
                             <th>Nom</th>
                             <th>Role</th>
                             <th>Options</th>
@@ -50,6 +51,11 @@ class ClassCreateContent extends HTMLElement {
                             <input id="role" name="role" type="text" placeholder="Ex: Tank" required maxlength="40">
                             <small class="error" data-error-for="role"></small>
                         </div>
+						
+						<div class="field">
+						    <label for="icon">URL de l'icône</label>
+						    <input id="icon" name="icon" type="text" placeholder="Ex: assets/warrior.png">
+						</div>
 
                         <div class="actions">
                             <button class="primary-btn" type="submit">Creer la classe</button>
@@ -275,6 +281,8 @@ class ClassCreateContent extends HTMLElement {
         const form = this.querySelector("#class-create-form");
         const nomInput = this.querySelector("#nom");
         const roleInput = this.querySelector("#role");
+		const iconInput = this.querySelector("#icon");
+		
         const messageEl = this.querySelector("#global-message");
 
         const setFieldError = (field, message) => {
@@ -331,6 +339,9 @@ class ClassCreateContent extends HTMLElement {
                 .map((classe) => `
                     <tr>
                         <td>${classe.id ?? "-"}</td>
+						<td>
+			                ${classe.icon ? `<img src="${classe.icon}" alt="" style="width:24px; height:24px; vertical-align:middle; margin-right:8px; border-radius:4px;">` : ''}
+			            </td>
                         <td>${classe.nom ?? "-"}</td>
                         <td>${classe.role ?? "-"}</td>
                         <td>
@@ -397,7 +408,8 @@ class ClassCreateContent extends HTMLElement {
 
             const payload = {
                 nom: nomInput.value.trim(),
-                role: roleInput.value.trim()
+                role: roleInput.value.trim(),
+				icon: iconInput.value.trim()
             };
 
             try {

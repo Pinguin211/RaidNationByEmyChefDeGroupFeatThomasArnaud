@@ -32,6 +32,9 @@ public class Classe {
     @JsonIgnoreProperties({"classes", "groupes"})
     private Set<Player> players = new HashSet<>();
 
+    @Column(nullable = true)
+    private String icon; 
+    
     /** Constructeur par defaut requis par JPA. */
     public Classe() {
     }
@@ -67,4 +70,14 @@ public class Classe {
     public void setPlayers(Set<Player> players) {
         this.players = players;
     }
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+    
+    
 }

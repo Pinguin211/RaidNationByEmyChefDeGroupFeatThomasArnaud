@@ -59,6 +59,8 @@ public class ClasseController {
         Classe classe = new Classe();
         classe.setNom(request.nom().trim());
         classe.setRole(request.role().trim());
+        classe.setIcon(request.icon().trim());
+        
 
         return ResponseEntity.status(HttpStatus.CREATED).body(classeRepository.save(classe));
     }
@@ -92,7 +94,7 @@ public class ClasseController {
         return ResponseEntity.noContent().build();
     }
 
-    public record CreateClasseRequest(String nom, String role) {
+    public record CreateClasseRequest(String nom, String role, String icon) {
     }
     
     @GetMapping
