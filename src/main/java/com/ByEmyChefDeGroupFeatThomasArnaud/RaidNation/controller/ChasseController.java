@@ -2,6 +2,11 @@ package com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.controller;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,17 +23,25 @@ import com.ByEmyChefDeGroupFeatThomasArnaud.RaidNation.repository.ChasseReposito
 
 @RestController
 @RequestMapping("/api/chasses")
+@Tag(name = "Chasses", description = "Gestion des activites de type chasse au tresor")
 public class ChasseController {
 	@Autowired 
 	private ChasseRepository chasseRepository;
 	
 	@PostMapping
+	@Operation(summary = "Creer une chasse au tresor")
+	@ApiResponse(responseCode = "200", description = "Chasse creee")
 	public ResponseEntity<ChasseTresor> createChasseTresor(@RequestBody ChasseTresor r) {	
 		chasseRepository.save(r);
 		return ResponseEntity.ok(r);
 	}
 	
 	@GetMapping("/{id}")
+	@Operation(summary = "Recuperer une chasse par ID")
+	@ApiResponses({
+			@ApiResponse(responseCode = "200", description = "Chasse trouvee"),
+			@ApiResponse(responseCode = "404", description = "Chasse introuvable", content = @Content)
+	})
 	public ResponseEntity<ChasseTresor> getChasseTresor(@PathVariable Long id) {
 		ChasseTresor r;
 		try {
@@ -41,6 +54,8 @@ public class ChasseController {
 	}
 	
 	@GetMapping
+	@Operation(summary = "Lister toutes les chasses")
+	@ApiResponse(responseCode = "200", description = "Liste des chasses")
 	public List<ChasseTresor> getAllChasseTresor() {
 		List <ChasseTresor> n;
 		n = (List<ChasseTresor>) chasseRepository.findAll();
@@ -49,6 +64,8 @@ public class ChasseController {
 	
 	
 	@PutMapping("/{id}")
+	@Operation(summary = "Modifier une chasse au tresor")
+	@ApiResponse(responseCode = "200", description = "Chasse modifiee")
 	public ResponseEntity<ChasseTresor> updateChasseTresor(@PathVariable Long id, @RequestBody ChasseTresor r){
 		ChasseTresor r2 = chasseRepository.findById(id).get();
 		if(r.getType()!=null) { r2.setType(r.getType());}
@@ -59,6 +76,8 @@ public class ChasseController {
 	}
 	
 	@DeleteMapping("/{id}")
+	@Operation(summary = "Supprimer une chasse au tresor")
+	@ApiResponse(responseCode = "200", description = "Chasse supprimee")
 	public ResponseEntity<ChasseTresor> deleteNourriture(@PathVariable Long id){
 		chasseRepository.deleteById(id);
 		return ResponseEntity.ok().build();
